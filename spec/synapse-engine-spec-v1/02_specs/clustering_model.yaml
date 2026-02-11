@@ -1,0 +1,24 @@
+clustering_model:
+  version: "2026-02-05"
+  method: "hierarchical"
+  target_clusters: "auto"    # expect 3-8
+  min_cluster_size: 3
+  max_cluster_size: 15
+
+  distance_dimensions:
+    semantic_embedding: 0.30
+    intent_distance: 0.25
+    perspective_distance: 0.25
+    entity_overlap: 0.20
+
+  labeling:
+    method: "llm_labeler"
+    output:
+      cluster_name: "string"
+      dominant_intent: "enum"
+      dominant_perspective: "enum"
+      hub_entities: ["string"]
+
+  bridges:
+    identify_bridge_nodes: true
+    min_bridge_strength: 0.50

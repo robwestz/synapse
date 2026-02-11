@@ -1,0 +1,94 @@
+{
+  "version": "1.0.0",
+  "updated": "2025-12-25T10:00:00Z",
+  "skills": [
+    {
+      "slug": "first-party-ingest",
+      "name": "First-Party Ingest & Entity Mapping",
+      "purpose": "Collect and normalize GA4, GSC, and log data into entity-level performance signals.",
+      "depends_on": [],
+      "produces": ["entity_metrics.parquet", "cannibalization.json", "decay_report.json"],
+      "feeds": ["impact-forecaster", "monitoring-agent", "competitive-modeler"]
+    },
+    {
+      "slug": "render-crawler",
+      "name": "Render Crawler & Site Audit",
+      "purpose": "Render, crawl, and audit pages for technical SEO issues and indexability.",
+      "depends_on": [],
+      "produces": ["url_index.csv", "audit_issues.md", "schema_inventory.json"],
+      "feeds": ["link-graph-analytics", "schema-compiler", "monitoring-agent"]
+    },
+    {
+      "slug": "entity-reconciler",
+      "name": "Entity Reconciliation & E-E-A-T Graph",
+      "purpose": "Align internal entities with Wikidata/Schema.org and build author/org trust graphs.",
+      "depends_on": ["first-party-ingest"],
+      "produces": ["reconciled_entities.json", "author_org_graph.json", "alias_index.tsv", "provenance_manifest.json"],
+      "feeds": ["schema-compiler", "quality-harness", "competitive-modeler"]
+    },
+    {
+      "slug": "competitive-modeler",
+      "name": "Competitive Landscape & SERP Feature Ownership",
+      "purpose": "Compare topical coverage vs competitors and simulate SERP feature potential.",
+      "depends_on": ["entity-reconciler"],
+      "produces": ["coverage_matrix.csv", "opportunity_heatmap.png", "feature_playbook.md"],
+      "feeds": ["impact-forecaster", "programmatic-factory"]
+    },
+    {
+      "slug": "impact-forecaster",
+      "name": "Effort→Impact Forecasting & Prioritization",
+      "purpose": "Compute traffic and ROI forecasts under resource constraints.",
+      "depends_on": ["first-party-ingest", "competitive-modeler"],
+      "produces": ["backlog_prioritized.csv", "assumptions.yaml", "confidence_bands.json"],
+      "feeds": ["programmatic-factory", "delivery-devops", "monitoring-agent"]
+    },
+    {
+      "slug": "monitoring-agent",
+      "name": "Continuous Monitoring & Diff Agent",
+      "purpose": "Track regressions and deltas between TAA runs using artifact-level diffs.",
+      "depends_on": ["impact-forecaster", "link-graph-analytics"],
+      "produces": ["diff_report.md", "alerts.json", "run_log/"],
+      "feeds": ["quality-harness", "delivery-devops"]
+    },
+    {
+      "slug": "quality-harness",
+      "name": "Content Quality & Factuality Harness",
+      "purpose": "Evaluate factuality, depth, and authoritativeness of content.",
+      "depends_on": ["entity-reconciler", "monitoring-agent"],
+      "produces": ["quality_report.csv", "fact_check.json", "thin_content_list.md"],
+      "feeds": ["programmatic-factory", "delivery-devops"]
+    },
+    {
+      "slug": "programmatic-factory",
+      "name": "Programmatic SEO Factory",
+      "purpose": "Generate and QA large-scale parametric SEO pages from templates.",
+      "depends_on": ["impact-forecaster", "quality-harness", "schema-compiler"],
+      "produces": ["pages/*.html", "noindex_list.txt", "manifest.json"],
+      "feeds": ["delivery-devops", "monitoring-agent"]
+    },
+    {
+      "slug": "link-graph-analytics",
+      "name": "Link Graph Analytics & Flow Modeling",
+      "purpose": "Model internal link equity and semantic authority flow.",
+      "depends_on": ["render-crawler"],
+      "produces": ["graph_metrics.csv", "decay_report.csv", "recommendations.md"],
+      "feeds": ["monitoring-agent", "impact-forecaster"]
+    },
+    {
+      "slug": "schema-compiler",
+      "name": "Structured Data Compiler & Validator",
+      "purpose": "Generate and validate JSON-LD markup for pages and entities.",
+      "depends_on": ["entity-reconciler"],
+      "produces": ["jsonld/*.json", "validation_report.md", "feature_scores.csv"],
+      "feeds": ["programmatic-factory", "delivery-devops"]
+    },
+    {
+      "slug": "delivery-devops",
+      "name": "Delivery & DevOps Integration",
+      "purpose": "Automate export, deployment, and rollback of SEO artifacts to CMS or edge.",
+      "depends_on": ["programmatic-factory", "schema-compiler", "quality-harness"],
+      "produces": ["manifest.json", "deploy_log", "rollback_manifest.json"],
+      "feeds": ["monitoring-agent"]
+    }
+  ]
+}

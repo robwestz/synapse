@@ -1,0 +1,488 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SIE-X Control Center</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">SIE-X</div>
+      <div class="tag">Semantic control center for connected tools</div>
+    </div>
+    <div class="top-actions">
+      <button class="chip" data-action="open-docs">Open docs</button>
+      <button class="chip ghost" data-action="focus-command">New extraction</button>
+      <a class="chip ghost" href="http://localhost:5173" target="_blank" rel="noopener">Knowledge base</a>
+      <a class="chip ghost" href="control.html">Dev console</a>
+    </div>
+  </header>
+
+  <section class="status-strip" aria-label="System snapshot">
+    <div class="strip-card primary">
+      <div class="strip-label">System</div>
+      <div class="strip-value" data-stat="status">--</div>
+      <div class="strip-sub">mode <span data-stat="mode">--</span></div>
+    </div>
+    <div class="strip-card">
+      <div class="strip-label">Health score</div>
+      <div class="strip-value"><span data-stat="health_score">--</span>%</div>
+      <div class="strip-sub" data-stat="health_state">--</div>
+      <div class="strip-meter"><span data-meter="health_score"></span></div>
+    </div>
+    <div class="strip-card">
+      <div class="strip-label">Avg latency</div>
+      <div class="strip-value" data-stat="avg_latency_ms">--</div>
+      <div class="strip-sub">rolling 5m</div>
+    </div>
+    <div class="strip-card">
+      <div class="strip-label">Queue depth</div>
+      <div class="strip-value" data-stat="queue_depth">--</div>
+      <div class="strip-sub">waiting</div>
+    </div>
+    <div class="strip-card">
+      <div class="strip-label">Requests today</div>
+      <div class="strip-value" data-stat="requests_today">--</div>
+      <div class="strip-sub" data-stat="local_time">--</div>
+    </div>
+    <div class="strip-card">
+      <div class="strip-label">Connectors / Pipelines</div>
+      <div class="strip-value"><span data-stat="active_connectors">--</span>/<span data-stat="pipelines_running">--</span></div>
+      <div class="strip-sub">active now</div>
+    </div>
+  </section>
+
+  <div class="layout">
+    <aside class="rail left">
+      <nav class="nav">
+        <a class="nav-item active" href="#hub">Hub</a>
+        <a class="nav-item" href="#flight-deck">Flight Deck</a>
+        <a class="nav-item" href="#connections">Connections</a>
+        <a class="nav-item" href="#pipelines">Pipelines</a>
+        <a class="nav-item" href="#runs">Runs</a>
+        <div class="nav-divider"></div>
+        <span class="nav-section">SEO Intelligence</span>
+        <a class="nav-item" href="#intent-classification">Intent Classification</a>
+        <a class="nav-item" href="#keyword-clustering">Keyword Clustering</a>
+        <a class="nav-item" href="#serp-analysis">SERP Analysis</a>
+        <div class="nav-divider"></div>
+        <a class="nav-item" href="#">Settings</a>
+      </nav>
+
+      <details class="panel mini is-collapsible" style="--delay: 0.1s" open>
+        <summary class="panel-summary">
+          <div class="mini-title">System</div>
+          <div class="mini-row">
+            <span class="dot ok" data-status-dot></span>
+            <span class="mini-text" data-stat="status">checking</span>
+          </div>
+        </summary>
+        <div class="panel-body">
+          <div class="mini-kv">
+            <div>Uptime</div>
+            <div data-stat="uptime">--</div>
+          </div>
+          <div class="mini-kv">
+            <div>Version</div>
+            <div data-stat="version">--</div>
+          </div>
+          <div class="mini-kv">
+            <div>API base</div>
+            <div data-stat="api_url">--</div>
+          </div>
+        </div>
+      </details>
+
+      <details class="panel mini is-collapsible" style="--delay: 0.2s" open>
+        <summary class="panel-summary">
+          <div class="mini-title">Capabilities</div>
+        </summary>
+        <div class="panel-body">
+          <div class="pill-row" data-list="capabilities"></div>
+        </div>
+      </details>
+    </aside>
+
+    <main class="main">
+      <details class="panel hero is-collapsible" style="--delay: 0.05s" data-component="hub-map" id="hub" open>
+        <summary class="panel-summary">
+          <div class="hero-head">
+            <div>
+              <h1>Signal Hub</h1>
+              <p>Route intelligence between your internal stack and external tools. Treat SIE-X as the semantic switchboard.</p>
+            </div>
+            <div class="hero-metrics">
+              <div class="hero-metric">
+                <div class="metric-label">Models loaded</div>
+                <div class="metric-value" data-stat="models_loaded">--</div>
+              </div>
+              <div class="hero-metric">
+                <div class="metric-label">Total extractions</div>
+                <div class="metric-value" data-stat="total_extractions">--</div>
+              </div>
+            </div>
+          </div>
+        </summary>
+        <div class="panel-body">
+          <div class="hub-map">
+            <div class="hub-core">
+              <div class="core-ring"></div>
+              <span>SIE-X</span>
+            </div>
+            <div class="hub-node node-a">Extract</div>
+            <div class="hub-node node-b">Batch</div>
+            <div class="hub-node node-c">Stream</div>
+            <div class="hub-node node-d">Multilang</div>
+            <div class="hub-node node-e">Models</div>
+            <div class="hub-path path-a"></div>
+            <div class="hub-path path-b"></div>
+            <div class="hub-path path-c"></div>
+            <div class="hub-path path-d"></div>
+            <div class="hub-path path-e"></div>
+          </div>
+        </div>
+      </details>
+
+      <details class="panel flight is-collapsible" style="--delay: 0.07s" data-component="flight-deck" id="flight-deck" open>
+        <summary class="panel-summary">
+          <div class="panel-head">
+            <h3>Flight Deck</h3>
+            <span class="panel-note">Live controls</span>
+          </div>
+        </summary>
+        <div class="panel-body">
+          <div class="flight-grid" data-list="flight_actions"></div>
+          <div class="flight-lanes">
+            <div class="flight-lane">
+              <div class="mini-title">Alerts</div>
+              <div class="alert-list" data-list="alerts"></div>
+            </div>
+            <div class="flight-lane">
+              <div class="mini-title">Focus queue</div>
+              <div class="focus-list" data-list="focus"></div>
+            </div>
+          </div>
+        </div>
+      </details>
+
+      <details class="panel command is-collapsible" style="--delay: 0.08s" data-component="command" open>
+        <summary class="panel-summary">
+          <div class="panel-head">
+            <h3>Command Deck</h3>
+            <span class="panel-note">Live extraction</span>
+          </div>
+        </summary>
+        <div class="panel-body">
+          <div class="command-grid">
+            <div class="command-input">
+              <label class="field-label" for="command-text">Text to analyze</label>
+              <textarea id="command-text" data-field="input" rows="7" placeholder="Paste text or load a sample to run extraction."></textarea>
+              <div class="command-actions">
+                <button class="chip primary" data-action="run-extract">Run extraction</button>
+                <button class="chip ghost" data-action="run-batch">Batch demo</button>
+                <button class="chip ghost" data-action="clear-results">Clear</button>
+              </div>
+              <div class="command-footer">
+              <div class="command-status" data-stat="command_status" aria-live="polite">Idle</div>
+              <div class="command-error" data-stat="command_error" aria-live="assertive"></div>
+              </div>
+            </div>
+            <div class="command-options">
+              <div class="field">
+                <label>API base</label>
+                <input type="url" data-field="api_base" placeholder="http://localhost:8000">
+              </div>
+              <div class="field">
+                <label>Top K</label>
+                <input type="number" min="1" max="50" data-field="top_k" value="10">
+              </div>
+              <div class="field">
+                <label>Min confidence</label>
+                <input type="number" min="0" max="1" step="0.1" data-field="min_confidence" value="0.3">
+              </div>
+              <div class="field">
+                <label>Language</label>
+                <input type="text" maxlength="2" data-field="language" value="en">
+              </div>
+              <div class="field check-row">
+                <label><input type="checkbox" data-field="include_entities" checked> Entities</label>
+                <label><input type="checkbox" data-field="include_concepts" checked> Concepts</label>
+              </div>
+              <div class="command-meta">
+                <div class="mini-kv">
+                  <div>Last run</div>
+                  <div data-stat="last_run">--</div>
+                </div>
+                <div class="mini-kv">
+                  <div>Keywords</div>
+                  <div data-stat="last_keyword_count">--</div>
+                </div>
+                <div class="mini-kv">
+                  <div>Processing</div>
+                  <div data-stat="last_processing_time">--</div>
+                </div>
+              </div>
+              <div class="command-samples">
+                <div class="mini-title">Samples</div>
+                <div class="pill-row" data-list="samples"></div>
+              </div>
+            </div>
+          </div>
+          <div class="keyword-grid" data-list="keywords"></div>
+        </div>
+      </details>
+
+      <section class="grid">
+        <details class="panel is-collapsible" style="--delay: 0.1s" id="connections" open>
+          <summary class="panel-summary">
+            <div class="panel-head">
+              <h3>Connections</h3>
+              <span class="panel-note">Live bridges</span>
+            </div>
+          </summary>
+          <div class="panel-body">
+            <div class="list" data-list="connections"></div>
+          </div>
+        </details>
+
+        <details class="panel is-collapsible" style="--delay: 0.15s" id="pipelines" open>
+          <summary class="panel-summary">
+            <div class="panel-head">
+              <h3>Pipelines</h3>
+              <span class="panel-note">Workflow state</span>
+            </div>
+          </summary>
+          <div class="panel-body">
+            <div class="list" data-list="pipelines"></div>
+          </div>
+        </details>
+
+        <details class="panel is-collapsible" style="--delay: 0.2s" open>
+          <summary class="panel-summary">
+            <div class="panel-head">
+              <h3>Models</h3>
+              <span class="panel-note">Loaded assets</span>
+            </div>
+          </summary>
+          <div class="panel-body">
+            <div class="list" data-list="models"></div>
+          </div>
+        </details>
+
+        <details class="panel is-collapsible" style="--delay: 0.25s" open>
+          <summary class="panel-summary">
+            <div class="panel-head">
+              <h3>Endpoints</h3>
+              <span class="panel-note">Routes online</span>
+            </div>
+          </summary>
+          <div class="panel-body">
+            <div class="list" data-list="endpoints"></div>
+          </div>
+        </details>
+
+        <details class="panel is-collapsible" style="--delay: 0.3s" id="runs" open>
+          <summary class="panel-summary">
+            <div class="panel-head">
+              <h3>Runs</h3>
+              <span class="panel-note">Recent executions</span>
+            </div>
+          </summary>
+          <div class="panel-body">
+            <div class="list" data-list="runs"></div>
+          </div>
+        </details>
+
+        <details class="panel is-collapsible" style="--delay: 0.35s" open>
+          <summary class="panel-summary">
+            <div class="panel-head">
+              <h3>Metrics</h3>
+              <span class="panel-note">Live API stats</span>
+            </div>
+          </summary>
+          <div class="panel-body">
+            <div class="metrics">
+              <div class="metric-card">
+                <div class="metric-label">Total extractions</div>
+                <div class="metric-value" data-stat="total_extractions">--</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Avg processing time</div>
+                <div class="metric-value" data-stat="avg_processing_time">--</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Errors</div>
+                <div class="metric-value" data-stat="errors">--</div>
+              </div>
+              <div class="metric-card">
+                <div class="metric-label">Cache size</div>
+                <div class="metric-value" data-stat="cache_size">--</div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- SEO Intelligence Section -->
+      <section class="grid seo-intelligence" id="seo-tools">
+        <details class="panel seo-panel is-collapsible" style="--delay: 0.4s" id="intent-classification" open>
+          <summary class="panel-summary">
+            <div class="panel-head">
+              <h3>Intent Classification</h3>
+              <span class="panel-note">BERT-powered</span>
+            </div>
+          </summary>
+          <div class="panel-body">
+            <div class="intent-input">
+              <label class="field-label">Keywords to classify (one per line)</label>
+              <textarea id="intent-keywords" data-field="intent-keywords" rows="4" placeholder="best laptop 2024
+how to fix iphone screen
+amazon login
+buy nike shoes online"></textarea>
+              <div class="command-actions">
+                <button class="chip primary" data-action="run-intent">Classify</button>
+                <button class="chip ghost" data-action="load-intent-samples">Samples</button>
+                <button class="chip ghost" data-action="clear-intent">Clear</button>
+              </div>
+            </div>
+            <div class="intent-results" data-list="intent-results"></div>
+            <div class="intent-distribution" data-chart="intent-distribution"></div>
+          </div>
+        </details>
+
+        <details class="panel seo-panel is-collapsible" style="--delay: 0.45s" id="keyword-clustering" open>
+          <summary class="panel-summary">
+            <div class="panel-head">
+              <h3>Keyword Clustering</h3>
+              <span class="panel-note">Word2Vec + K-means</span>
+            </div>
+          </summary>
+          <div class="panel-body">
+            <div class="cluster-input">
+              <label class="field-label">Keywords to cluster (10-500)</label>
+              <textarea id="cluster-keywords" data-field="cluster-keywords" rows="5" placeholder="Enter keywords, one per line (min 10 recommended)"></textarea>
+              <div class="cluster-options">
+                <div class="field inline">
+                  <label>Clusters</label>
+                  <input type="number" min="3" max="30" value="10" data-field="num-clusters" style="width: 60px">
+                </div>
+                <div class="field inline">
+                  <label>Algorithm</label>
+                  <select data-field="cluster-algorithm">
+                    <option value="kmeans" selected>K-means</option>
+                    <option value="dbscan">DBSCAN</option>
+                  </select>
+                </div>
+              </div>
+              <div class="command-actions">
+                <button class="chip primary" data-action="run-cluster">Cluster</button>
+                <button class="chip ghost" data-action="export-clusters">Export</button>
+                <button class="chip ghost" data-action="clear-clusters">Clear</button>
+              </div>
+            </div>
+            <div class="cluster-results" data-list="cluster-results"></div>
+          </div>
+        </details>
+
+        <details class="panel seo-panel is-collapsible" style="--delay: 0.5s" id="serp-analysis" open>
+          <summary class="panel-summary">
+            <div class="panel-head">
+              <h3>SERP Analysis</h3>
+              <span class="panel-note">Search insights</span>
+            </div>
+          </summary>
+          <div class="panel-body">
+            <div class="serp-input">
+              <label class="field-label">Query to analyze</label>
+              <input type="text" id="serp-query" data-field="serp-query" placeholder="Enter search query">
+              <div class="serp-options">
+                <div class="field inline">
+                  <label>Location</label>
+                  <select data-field="serp-location">
+                    <option value="us" selected>United States</option>
+                    <option value="uk">United Kingdom</option>
+                    <option value="se">Sweden</option>
+                    <option value="de">Germany</option>
+                  </select>
+                </div>
+                <div class="field inline">
+                  <label>Device</label>
+                  <select data-field="serp-device">
+                    <option value="desktop" selected>Desktop</option>
+                    <option value="mobile">Mobile</option>
+                  </select>
+                </div>
+              </div>
+              <div class="command-actions">
+                <button class="chip primary" data-action="run-serp">Analyze</button>
+                <button class="chip ghost" data-action="load-serp-sample">Sample</button>
+              </div>
+            </div>
+            <div class="serp-features" data-list="serp-features"></div>
+            <div class="serp-results" data-list="serp-results"></div>
+          </div>
+        </details>
+      </section>
+    </main>
+
+    <aside class="rail right">
+      <details class="panel is-collapsible" style="--delay: 0.2s" open>
+        <summary class="panel-summary">
+          <div class="panel-head">
+            <h3>Activity</h3>
+            <span class="panel-note">Event log</span>
+          </div>
+        </summary>
+        <div class="panel-body">
+          <div class="list" data-list="activity"></div>
+        </div>
+      </details>
+
+      <details class="panel mini is-collapsible" style="--delay: 0.3s" open>
+        <summary class="panel-summary">
+          <div class="mini-title">Languages</div>
+        </summary>
+        <div class="panel-body">
+          <div class="pill-row" data-list="languages"></div>
+        </div>
+      </details>
+
+      <details class="panel mini is-collapsible" style="--delay: 0.35s" open>
+        <summary class="panel-summary">
+          <div class="mini-title">Diagnostics</div>
+        </summary>
+        <div class="panel-body">
+          <div class="mini-kv">
+            <div>Last refresh</div>
+            <div data-stat="last_refresh">--</div>
+          </div>
+          <div class="mini-kv">
+            <div>Request rate</div>
+            <div data-stat="request_rate">--</div>
+          </div>
+        </div>
+      </details>
+    </aside>
+  </div>
+
+  <div class="drawer-overlay" data-drawer-overlay></div>
+  <aside class="drawer" data-drawer aria-hidden="true" tabindex="-1">
+    <div class="drawer-head">
+      <div>
+        <div class="drawer-type" data-drawer-type>Details</div>
+        <h3 class="drawer-title" data-drawer-title>--</h3>
+      </div>
+      <div class="drawer-head-actions">
+        <span class="badge paused" data-drawer-badge>--</span>
+        <button class="icon-button" type="button" data-action="close-drawer" aria-label="Close details">Close</button>
+      </div>
+    </div>
+    <p class="drawer-description" data-drawer-description hidden></p>
+    <div class="drawer-meta" data-drawer-meta></div>
+  </aside>
+
+  <script src="app.js"></script>
+</body>
+</html>

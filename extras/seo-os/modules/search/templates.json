@@ -1,0 +1,39 @@
+{
+  "tools": {
+    "basic_serp": {
+      "name": "🔎 Grundläggande SERP",
+      "description": "Hämta rådata från sökresultaten.",
+      "inputs": ["keyword"],
+      "selectable_fields": ["rank", "title", "link", "snippet"],
+      "default_fields": ["rank", "title", "link"]
+    },
+    "competitor_audit": {
+      "name": "⚔️ Konkurrentanalys",
+      "description": "Identifiera konkurrenter och analysera deras titlar.",
+      "inputs": ["keyword"],
+      "selectable_fields": ["rank", "domain", "title_length", "snippet_sentiment"],
+      "default_fields": ["rank", "domain", "title"]
+    },
+    "super_cluster": {
+      "name": "⚡ Super Clusters & Intent",
+      "description": "Klustra sökresultat automatiskt och gissa sökintention (Intent).",
+      "inputs": ["keyword"],
+      "selectable_fields": ["intent", "cluster_name", "entities"],
+      "default_fields": ["rank", "title", "intent", "cluster_name"]
+    },
+    "seo_audit": {
+      "name": "🚀 Full SEO Strategy Audit",
+      "description": "Djupanalys av SERP:en: CTR-möjligheter, svårighetsgrad och title-hälsa.",
+      "inputs": ["keyword"],
+      "selectable_fields": ["intent", "title_status", "power_words", "has_year", "cluster_name"],
+      "default_fields": ["rank", "title", "intent", "title_status", "power_words"]
+    },
+    "content_gap": {
+      "name": "🕳️ Content Gap (Placeholder)",
+      "description": "Hitta vad som saknas i ditt innehåll jämfört med toppresultaten.",
+      "inputs": ["keyword", "my_url"],
+      "selectable_fields": ["missing_keywords", "word_count_diff", "headings"],
+      "default_fields": ["missing_keywords"]
+    }
+  }
+}

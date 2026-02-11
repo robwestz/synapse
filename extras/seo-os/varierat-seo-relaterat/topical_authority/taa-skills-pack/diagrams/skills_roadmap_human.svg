@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="600" viewBox="0 0 1400 600">
+  <style>
+    .title { font: 700 24px system-ui; fill: #1c1c1c }
+    .phase { font: 700 16px system-ui; fill: #fff }
+    .item { font: 12px system-ui; fill: #222 }
+    .card { rx: 12; ry: 12; stroke: #e2e8f0; stroke-width: 1; }
+  </style>
+  <rect width="100%" height="100%" fill="#fafbff"/>
+  <text x="32" y="42" class="title">TAA Skill Roadmap</text>
+  <g transform="translate(20,70)">
+    <rect width="260" height="460" fill="#3b82f6" class="card"/>
+    <text x="16" y="28" class="phase">Ingest</text>
+    <g transform="translate(16,56)">
+      <text class="item" y="0">• first-party-ingest</text>
+      <text class="item" y="22">• render-crawler</text>
+    </g>
+  </g>
+  <g transform="translate(300,70)">
+    <rect width="260" height="460" fill="#8b5cf6" class="card"/>
+    <text x="16" y="28" class="phase">Knowledge</text>
+    <g transform="translate(16,56)">
+      <text class="item" y="0">• entity-reconciler</text>
+      <text class="item" y="22">• link-graph-analytics</text>
+    </g>
+  </g>
+  <g transform="translate(580,70)">
+    <rect width="260" height="460" fill="#f59e0b" class="card"/>
+    <text x="16" y="28" class="phase">Forecast</text>
+    <g transform="translate(16,56)">
+      <text class="item" y="0">• competitive-modeler</text>
+      <text class="item" y="22">• impact-forecaster</text>
+    </g>
+  </g>
+  <g transform="translate(860,70)">
+    <rect width="260" height="460" fill="#10b981" class="card"/>
+    <text x="16" y="28" class="phase">Automate</text>
+    <g transform="translate(16,56)">
+      <text class="item" y="0">• quality-harness</text>
+      <text class="item" y="22">• schema-compiler</text>
+      <text class="item" y="44">• programmatic-factory</text>
+    </g>
+  </g>
+  <g transform="translate(1140,70)">
+    <rect width="240" height="460" fill="#ef4444" class="card"/>
+    <text x="16" y="28" class="phase">Deliver</text>
+    <g transform="translate(16,56)">
+      <text class="item" y="0">• delivery-devops</text>
+      <text class="item" y="22">• monitoring-agent</text>
+    </g>
+  </g>
+</svg>

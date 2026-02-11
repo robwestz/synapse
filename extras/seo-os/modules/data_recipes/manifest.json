@@ -1,0 +1,9 @@
+{
+  "id": "data_recipes",
+  "name": "Data Recipes",
+  "version": "1.0.0",
+  "description": "Configure and test data extraction presets.",
+  "category": "Configuration",
+  "icon": "🍳",
+  "entry_point": "ui.py"
+}

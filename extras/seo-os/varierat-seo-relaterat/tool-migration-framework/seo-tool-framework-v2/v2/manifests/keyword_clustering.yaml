@@ -1,0 +1,89 @@
+# Keyword Clustering Tool Manifest
+
+tool:
+  id: keyword_clustering
+  name: "Keyword Clustering"
+  description: "Cluster keywords by semantic similarity using ML embeddings. Groups related keywords to identify content themes and pillar page opportunities."
+  
+  category: keywords
+  archetype: analyzer
+  icon: "🔍"
+  color: "#3B82F6"
+  
+  backend:
+    module: "tools.test_tools.keyword_clustering"
+    class: "KeywordClusteringService"
+    config_class: "KeywordClusteringServiceConfig"
+    result_class: "KeywordClusteringServiceResult"
+    method: "analyze"
+  
+  inputs:
+    - name: keywords
+      label: "Keywords to Cluster"
+      type: textarea
+      required: true
+      placeholder: |
+        seo tools
+        best seo software
+        keyword research tool
+        backlink checker
+        site audit tool
+        seo analytics
+        rank tracking
+        competitor analysis
+      description: "Enter keywords to cluster, one per line"
+    
+    - name: min_cluster_size
+      label: "Minimum Cluster Size"
+      type: number
+      default: 3
+      min: 2
+      max: 50
+      description: "Minimum number of keywords required to form a cluster"
+    
+    - name: similarity_threshold
+      label: "Similarity Threshold"
+      type: number
+      default: 0.7
+      min: 0.1
+      max: 1.0
+      description: "How similar keywords must be to be grouped together (0.1-1.0)"
+  
+  outputs:
+    type: table
+    primary_field: clusters
+    columns:
+      - name: cluster_id
+        label: "Cluster"
+        type: number
+      - name: name
+        label: "Theme"
+      - name: keywords
+        label: "Keywords"
+        type: array
+      - name: size
+        label: "Size"
+        type: number
+      - name: avg_similarity
+        label: "Similarity"
+        type: number
+      - name: suggested_pillar
+        label: "Pillar Page"
+      - name: search_volume_total
+        label: "Total Volume"
+        type: number
+  
+  actions:
+    - id: create_pillar
+      label: "Create Pillar Page Brief"
+      icon: "📄"
+      target_tool: rag_content_brief
+      pass_fields:
+        - name
+        - keywords
+    
+    - id: export
+      label: "Export Clusters"
+      icon: "📊"
+      type: export
+      format: csv

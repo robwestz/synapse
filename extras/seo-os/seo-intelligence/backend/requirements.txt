@@ -1,0 +1,58 @@
+# Core Framework
+fastapi==0.110.0
+uvicorn[standard]==0.27.0
+pydantic==2.6.0
+pydantic-settings==2.1.0
+
+# Database
+sqlalchemy==2.0.25
+asyncpg==0.29.0
+alembic==1.13.1
+pgvector==0.2.4
+
+# AI & ML
+anthropic==0.18.1
+openai==1.12.0  # For embeddings fallback
+voyageai==0.2.1  # Specialized semantic embeddings
+langchain==0.1.9
+langchain-anthropic==0.1.4
+
+# ML Stack
+scikit-learn==1.4.0
+hdbscan==0.8.33
+umap-learn==0.5.5
+numpy==1.26.3
+pandas==2.2.0
+spacy==3.7.2
+
+# Data Processing
+openpyxl==3.1.2  # Excel support
+python-multipart==0.0.9
+aiofiles==23.2.1
+
+# Workers & Cache
+celery[redis]==5.3.6
+redis==5.0.1
+
+# HTTP & API
+httpx==0.26.0
+requests==2.31.0
+
+# Utilities
+python-dateutil==2.8.2
+pytz==2024.1
+pydantic-core==2.16.1
+
+# Development
+pytest==8.0.0
+pytest-asyncio==0.23.3
+black==24.1.1
+ruff==0.1.14
+
+# Monitoring
+sentry-sdk[fastapi]==1.40.0
+
+# Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-dotenv==1.0.1

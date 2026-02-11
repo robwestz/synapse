@@ -1,0 +1,21 @@
+name: taa-ci
+on: [push, workflow_dispatch]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check presence of KB
+        run: |
+          test -f skills/index.json || echo "No local skills dir; using GPT-native KB"
+      - name: Validate command map JSON
+        run: |
+          python - <<'PY'
+          import json,sys
+          for f in ["command_map.json","router_plan.json","artifact_catalog.json","cli_aliases.json"]:
+              data=json.load(open(f))
+          print("OK")
+          PY
+      - name: Print artifacts index
+        run: |
+          cat artifact_catalog.json | head -n 80

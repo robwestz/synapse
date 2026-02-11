@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "IntentJudgeOutput.schema.json",
+  "title": "IntentJudgeOutput",
+  "type": "object",
+  "required": [
+    "phrase",
+    "language",
+    "market",
+    "dominant_intent",
+    "perspective",
+    "confidence",
+    "evidence_used",
+    "interpretations"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "phrase": {
+      "type": "string",
+      "minLength": 1
+    },
+    "language": {
+      "type": "string",
+      "minLength": 2
+    },
+    "market": {
+      "type": "string",
+      "minLength": 2
+    },
+    "dominant_intent": {
+      "type": "string",
+      "enum": [
+        "informational",
+        "howto",
+        "commercial",
+        "transactional",
+        "navigational",
+        "local",
+        "freshness"
+      ]
+    },
+    "secondary_intents": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "informational",
+          "howto",
+          "commercial",
+          "transactional",
+          "navigational",
+          "local",
+          "freshness"
+        ]
+      },
+      "maxItems": 2
+    },
+    "perspective": {
+      "type": "string",
+      "enum": [
+        "provider",
+        "seeker",
+        "advisor",
+        "regulator",
+        "neutral"
+      ]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "interpretations": {
+      "type": "object",
+      "required": [
+        "dominant",
+        "common",
+        "minor"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "dominant": {
+          "type": "string",
+          "minLength": 1
+        },
+        "common": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 2
+        },
+        "minor": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 2
+        }
+      }
+    },
+    "intent_mix": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "informational": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "howto": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "commercial": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "transactional": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "navigational": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "local": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "freshness": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        }
+      }
+    },
+    "evidence_used": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "serp_layout_prediction": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "features": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "result_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

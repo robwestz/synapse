@@ -1,0 +1,29 @@
+visual_model:
+  version: "2026-02-05"
+  coordinate_system:
+    x_axis: "intent_position"
+    y_axis: "perspective_position"
+    x_range: [0.0, 1.0]
+    y_range: [0.0, 1.0]
+
+  encoding:
+    node:
+      size: "volume_or_relevance"
+      opacity: "confidence"
+      border_style: "provenance"
+    edge:
+      thickness: "strength"
+      color: "strength_bucket"
+      min_strength_to_draw: 0.40
+    cluster:
+      fill_opacity: 0.08
+      label_opacity: 0.70
+
+  ui:
+    hover_tooltip: true
+    click_highlight: true
+    filters:
+      - "intent"
+      - "perspective"
+      - "provenance"
+      - "confidence_min"

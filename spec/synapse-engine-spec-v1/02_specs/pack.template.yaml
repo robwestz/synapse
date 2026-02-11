@@ -1,0 +1,33 @@
+pack:
+  id: "finance_se_sv"
+  version: "0.1.0"
+  language: "sv"
+  market: "SE"
+  vertical: "finance"
+
+  includes:
+    - "../intent_model.yaml"
+    - "../perspective_model.yaml"
+    - "../evidence_model.yaml"
+    - "../scoring_model.yaml"
+    - "../clustering_model.yaml"
+    - "../visual_model.yaml"
+    - "../normalization_model.yaml"
+
+  overrides:
+    modifier_rules:
+      transactional:
+        add_signals: ["låna", "ansök om", "ta lån", "lånelöfte"]
+      commercial:
+        add_signals: ["räntejämförelse", "låneförmedlare"]
+    perspective_signals:
+      provider:
+        add_phrases: ["lånelöfte", "ränta från", "ansök här"]
+      seeker:
+        add_phrases: ["betala av", "skuldsanering", "kvar att leva på"]
+
+  policy:
+    # What the UI should warn about for this vertical
+    anchor_safety:
+      fail_if_perspective_distance_ge: 0.7
+      warn_if_intent_distance_ge: 0.35

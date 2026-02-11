@@ -1,0 +1,123 @@
+{
+  "version": "1.0.0",
+  "updated": "2025-12-25T10:00:00Z",
+  "nodes": [
+    {
+      "id": "first-party-ingest",
+      "group": "input",
+      "label": "First-Party Ingest & Entity Mapping",
+      "inputs": [],
+      "outputs": ["out/ingest/entity_metrics.parquet", "out/ingest/cannibalization.json", "out/ingest/decay_report.json", "out/ingest/unmapped_queries.csv"],
+      "dependencies": [],
+      "description": "Collect & normalize GA4/GSC/logs and map to entities."
+    },
+    {
+      "id": "render-crawler",
+      "group": "input",
+      "label": "Render Crawler & Site Audit",
+      "inputs": [],
+      "outputs": ["out/crawl/url_index.csv", "out/crawl/audit_issues.md", "out/crawl/schema_inventory.json", "out/crawl/budget_simulation.csv"],
+      "dependencies": [],
+      "description": "JS rendering, indexability audit, schema inventory."
+    },
+    {
+      "id": "entity-reconciler",
+      "group": "knowledge",
+      "label": "Entity Reconciliation & E-E-A-T Graph",
+      "inputs": ["out/knowledge_graph.json"],
+      "outputs": ["out/entities/reconciled_entities.json", "out/entities/author_org_graph.json", "out/entities/alias_index.tsv", "out/entities/provenance_manifest.json"],
+      "dependencies": [],
+      "description": "Canonicalize entities, link to Wikidata/Schema.org, build E-E-A-T graph."
+    },
+    {
+      "id": "competitive-modeler",
+      "group": "analysis",
+      "label": "Competitive Landscape & SERP Feature Ownership",
+      "inputs": ["out/entities/reconciled_entities.json", "cache/serp_*.html"],
+      "outputs": ["out/competitive/coverage_matrix.csv", "out/competitive/opportunity_heatmap.png", "out/competitive/feature_playbook.md"],
+      "dependencies": ["entity-reconciler"],
+      "description": "Entity-level coverage parity vs competitors and SERP feature potential."
+    },
+    {
+      "id": "impact-forecaster",
+      "group": "analysis",
+      "label": "Effort→Impact Forecasting & Prioritization",
+      "inputs": ["out/ingest/entity_metrics.parquet", "out/competitive/coverage_matrix.csv", "out/forecast/assumptions.yaml"],
+      "outputs": ["out/forecast/backlog_prioritized.csv", "out/forecast/assumptions.yaml", "out/forecast/confidence_bands.json"],
+      "dependencies": ["first-party-ingest", "competitive-modeler"],
+      "description": "ROI forecasts and prioritized backlog under constraints."
+    },
+    {
+      "id": "link-graph-analytics",
+      "group": "analysis",
+      "label": "Link Graph Analytics & Flow Modeling",
+      "inputs": ["out/internal_linking.md", "out/knowledge_graph.json", "out/crawl/url_index.csv"],
+      "outputs": ["out/links/graph_metrics.csv", "out/links/decay_report.csv", "out/links/recommendations.md"],
+      "dependencies": ["render-crawler"],
+      "description": "Internal link equity, anchor entropy, and decay modeling."
+    },
+    {
+      "id": "quality-harness",
+      "group": "output",
+      "label": "Content Quality & Factuality Harness",
+      "inputs": ["out/briefs/*.md", "out/entities/reconciled_entities.json"],
+      "outputs": ["out/quality/quality_report.csv", "out/quality/fact_check.json", "out/quality/thin_content_list.md"],
+      "dependencies": ["entity-reconciler"],
+      "description": "Factuality, depth, redundancy and E-E-A-T scoring."
+    },
+    {
+      "id": "programmatic-factory",
+      "group": "output",
+      "label": "Programmatic SEO Factory",
+      "inputs": ["out/topic_clusters.json", "templates/*.jinja", "out/schema/jsonld/*.json"],
+      "outputs": ["out/programmatic/pages/*.html", "out/programmatic/noindex_list.txt", "out/programmatic/manifest.json"],
+      "dependencies": ["impact-forecaster", "quality-harness", "schema-compiler"],
+      "description": "Parametric page generation with uniqueness guards."
+    },
+    {
+      "id": "schema-compiler",
+      "group": "output",
+      "label": "Structured Data Compiler & Validator",
+      "inputs": ["out/entities/reconciled_entities.json", "out/briefs/*.md"],
+      "outputs": ["out/schema/jsonld/*.json", "out/schema/validation_report.md", "out/schema/feature_scores.csv"],
+      "dependencies": ["entity-reconciler"],
+      "description": "JSON-LD generation, validation, and feature readiness."
+    },
+    {
+      "id": "monitoring-agent",
+      "group": "ops",
+      "label": "Continuous Monitoring & Diff Agent",
+      "inputs": ["out/run_prev/**", "out/run_curr/**"],
+      "outputs": ["out/monitoring/diff_report.md", "out/monitoring/alerts.json", "out/monitoring/run_log/{timestamp}.log"],
+      "dependencies": [],
+      "description": "Artifact-level diffs and regression alerts."
+    },
+    {
+      "id": "delivery-devops",
+      "group": "ops",
+      "label": "Delivery & DevOps Integration",
+      "inputs": ["out/**"],
+      "outputs": ["out/deploy/manifest.json", "out/deploy/logs/{timestamp}.log", "out/deploy/rollback_manifest.json"],
+      "dependencies": ["programmatic-factory", "schema-compiler", "quality-harness"],
+      "description": "Export, publish, verify and rollback automation."
+    }
+  ],
+  "edges": [
+    {"from": "first-party-ingest", "to": "impact-forecaster", "type": "feeds"},
+    {"from": "entity-reconciler", "to": "competitive-modeler", "type": "feeds"},
+    {"from": "competitive-modeler", "to": "impact-forecaster", "type": "feeds"},
+    {"from": "render-crawler", "to": "link-graph-analytics", "type": "feeds"},
+    {"from": "entity-reconciler", "to": "schema-compiler", "type": "feeds"},
+    {"from": "schema-compiler", "to": "programmatic-factory", "type": "feeds"},
+    {"from": "quality-harness", "to": "programmatic-factory", "type": "feeds"},
+    {"from": "programmatic-factory", "to": "delivery-devops", "type": "feeds"},
+    {"from": "delivery-devops", "to": "monitoring-agent", "type": "feeds"},
+    {"from": "link-graph-analytics", "to": "monitoring-agent", "type": "feeds"},
+    {"from": "impact-forecaster", "to": "delivery-devops", "type": "feeds"}
+  ],
+  "defaults": {
+    "mode": "offline",
+    "format": "md",
+    "language": "sv"
+  }
+}

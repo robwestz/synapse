@@ -1,0 +1,274 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "GraphArtifact.schema.json",
+  "title": "GraphArtifact",
+  "type": "object",
+  "required": [
+    "meta",
+    "seed",
+    "nodes",
+    "edges",
+    "clusters",
+    "legend"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": [
+        "version",
+        "generated_at",
+        "language",
+        "market"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "generated_at": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "market": {
+          "type": "string"
+        }
+      }
+    },
+    "seed": {
+      "type": "object",
+      "required": [
+        "id",
+        "phrase",
+        "x",
+        "y",
+        "intent",
+        "perspective"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "phrase": {
+          "type": "string"
+        },
+        "x": {
+          "type": "number"
+        },
+        "y": {
+          "type": "number"
+        },
+        "intent": {
+          "type": "string"
+        },
+        "perspective": {
+          "type": "string"
+        }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "phrase",
+          "x",
+          "y",
+          "cluster_id",
+          "intent",
+          "perspective",
+          "confidence",
+          "provenance",
+          "size"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "phrase": {
+            "type": "string"
+          },
+          "x": {
+            "type": "number"
+          },
+          "y": {
+            "type": "number"
+          },
+          "cluster_id": {
+            "type": "string"
+          },
+          "intent": {
+            "type": "string"
+          },
+          "perspective": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "provenance": {
+            "type": "string"
+          },
+          "size": {
+            "type": "number"
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "from",
+          "to",
+          "strength",
+          "types",
+          "synapse_card"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "strength": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "types": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "synapse_card": {
+            "$ref": "SynapseCard.schema.json"
+          }
+        }
+      }
+    },
+    "clusters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "color",
+          "node_ids",
+          "dominant_intent",
+          "dominant_perspective",
+          "centroid"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "color": {
+            "type": "string"
+          },
+          "node_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dominant_intent": {
+            "type": "string"
+          },
+          "dominant_perspective": {
+            "type": "string"
+          },
+          "hub_entities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "centroid": {
+            "type": "object",
+            "required": [
+              "x",
+              "y"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "x": {
+                "type": "number"
+              },
+              "y": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    },
+    "legend": {
+      "type": "object",
+      "required": [
+        "intent_axis",
+        "perspective_axis",
+        "strength_buckets"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "intent_axis": {
+          "type": "string"
+        },
+        "perspective_axis": {
+          "type": "string"
+        },
+        "strength_buckets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "min",
+              "max",
+              "label"
+            ],
+            "properties": {
+              "min": {
+                "type": "number"
+              },
+              "max": {
+                "type": "number"
+              },
+              "label": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

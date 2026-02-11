@@ -1,0 +1,95 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Brutalist Design System */
+
+@layer base {
+  * {
+    @apply border-secondary;
+  }
+
+  body {
+    @apply antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-primary text-white font-bold shadow-brutal hover:shadow-brutal-lg transition-shadow;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 border-4 border-secondary font-bold shadow-brutal hover:shadow-brutal-lg transition-shadow;
+  }
+
+  .card {
+    @apply border-4 border-secondary p-6 shadow-brutal;
+  }
+
+  .card-highlight {
+    @apply border-primary bg-primary/5 shadow-brutal-lg;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 border-4 border-secondary font-mono focus:outline-none focus:border-primary;
+  }
+
+  .brutal-table {
+    @apply w-full border-4 border-secondary;
+  }
+
+  .brutal-table th {
+    @apply bg-secondary text-white font-display p-3 text-left;
+  }
+
+  .brutal-table td {
+    @apply border-t-2 border-secondary p-3;
+  }
+
+  .brutal-table tr:hover {
+    @apply bg-primary/5;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: white;
+  border-left: 2px solid black;
+}
+
+::-webkit-scrollbar-thumb {
+  background: black;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #FF0000;
+}
+
+/* Selection */
+::selection {
+  background: #FF0000;
+  color: white;
+}
+
+/* Loading animation */
+@keyframes pulse-brutal {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.loading-brutal {
+  animation: pulse-brutal 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

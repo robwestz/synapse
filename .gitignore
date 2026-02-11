@@ -1,0 +1,30 @@
+# Secrets
+.env
+*.env
+secrets.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Output
+out/
+artifacts/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Planning (local only)
+.planning/

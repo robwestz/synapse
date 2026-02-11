@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Synapse Map Viewer (GraphArtifact)</title>
+  <style>
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0f1117;color:#e0e0e0}
+    header{padding:14px 18px;border-bottom:1px solid #22283a;display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+    header h1{margin:0;font-size:14px;color:#a0aec0;letter-spacing:.5px}
+    header .seed{margin-top:4px;font-size:12px;color:#68d391}
+    .wrap{display:grid;grid-template-columns:1fr 340px;height:calc(100vh - 52px)}
+    #stage{position:relative;overflow:hidden}
+    svg{width:100%;height:100%}
+    .panel{border-left:1px solid #22283a;padding:12px;overflow:auto}
+    .panel h2{margin:0 0 8px;font-size:12px;color:#a0aec0;text-transform:uppercase;letter-spacing:1px}
+    textarea{width:100%;height:220px;background:#0b0d12;color:#e0e0e0;border:1px solid #22283a;border-radius:8px;padding:10px;font-family:ui-monospace,Consolas,monospace;font-size:11px;line-height:1.4}
+    button{margin-top:8px;width:100%;padding:10px;border-radius:10px;border:1px solid #2d3748;background:#1a1d28;color:#e0e0e0;font-weight:600;cursor:pointer}
+    button:hover{filter:brightness(1.12)}
+    .hint{margin-top:10px;font-size:11px;line-height:1.5;color:#718096}
+    .tooltip{position:absolute;display:none;max-width:340px;background:#1a1d28;border:1px solid #2d3748;border-radius:10px;padding:12px;box-shadow:0 8px 28px rgba(0,0,0,.45);pointer-events:none}
+    .tooltip.visible{display:block}
+    .t-title{font-size:13px;color:#fff;margin:0 0 6px}
+    .t-meta{font-size:11px;color:#a0aec0;margin-bottom:8px}
+    .t-card{font-size:11px;color:#cbd5e0;background:#0f1117;border-radius:8px;padding:8px;line-height:1.45}
+    .tag{display:inline-block;padding:2px 6px;border-radius:999px;background:#2d3748;margin-right:6px;font-size:10px;color:#cbd5e0}
+    .axis{position:absolute;font-size:10px;color:#4a5568;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;opacity:.9}
+    .axis.xl{left:14px;top:50%;transform:rotate(-90deg) translateX(50%);transform-origin:left}
+    .axis.xr{right:14px;top:50%;transform:rotate(90deg) translateX(-50%);transform-origin:right}
+    .axis.yt{left:50%;top:10px;transform:translateX(-50%)}
+    .axis.yb{left:50%;bottom:10px;transform:translateX(-50%)}
+    .legend{margin-top:12px;border-top:1px solid #22283a;padding-top:10px}
+    .legend-item{display:flex;gap:8px;align-items:center;margin:6px 0;font-size:11px;color:#a0aec0}
+    .dot{width:10px;height:10px;border-radius:50%}
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>SYNAPSE MAP VIEWER</h1>
+      <div class="seed" id="seedLine">Seed: —</div>
+    </div>
+    <div style="font-size:11px;color:#4a5568;text-align:right;line-height:1.4">
+      Axlar: <span style="color:#63b3ed">Intent</span> (vänster→höger) ·
+      <span style="color:#68d391">Perspective</span> (upp→ner)
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div id="stage">
+      <div class="axis yt">SEEKER</div>
+      <div class="axis yb">PROVIDER</div>
+      <div class="axis xl">INFORMATIONAL</div>
+      <div class="axis xr">TRANSACTIONAL</div>
+      <div class="tooltip" id="tooltip"></div>
+      <svg id="svg"></svg>
+    </div>
+
+    <div class="panel">
+      <h2>GraphArtifact JSON</h2>
+      <textarea id="json"></textarea>
+      <button id="render">Render</button>
+      <div class="hint">
+        Tips: klistra in GraphArtifact-output från ditt pipeline-jobb här.  
+        Viewer använder noder/edges/clusters och placerar punkter på (x,y) som kommer från intent×perspective.
+      </div>
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+<script>
+const sample = {"meta": {"version": "1.0.0", "generated_at": "2026-02-05T18:02:02Z", "language": "sv", "market": "SE"}, "seed": {"id": "q.cc09275a63", "phrase": "privatlån upp till 800 000", "x": 0.85, "y": 0.85, "intent": "transactional", "perspective": "provider"}, "nodes": [{"id": "q.5ddb3d4bab", "phrase": "alternativ till privatlån", "x": 0.5199071608693123, "y": 0.5389155900545688, "cluster_id": "B", "intent": "commercial", "perspective": "neutral", "confidence": 0.45, "provenance": "llm_inferred", "size": 12.554312798090253, "flags": []}, {"id": "q.e34b0e174a", "phrase": "billigast privatlån 800000", "x": 0.5202466964186744, "y": 0.5208535247880159, "cluster_id": "B", "intent": "commercial", "perspective": "neutral", "confidence": 0.45, "provenance": "llm_inferred", "size": 12.384086734371955, "flags": []}, {"id": "q.07c6ad203f", "phrase": "ansök privatlån online", "x": 0.872272502068028, "y": 0.8187799036895809, "cluster_id": "C", "intent": "transactional", "perspective": "provider", "confidence": 0.47, "provenance": "llm_inferred", "size": 12.172671684965376, "flags": []}, {"id": "q.dbcaee1c6a", "phrase": "ansök om privatlån", "x": 0.873581823814563, "y": 0.8569813607556236, "cluster_id": "C", "intent": "transactional", "perspective": "provider", "confidence": 0.47, "provenance": "llm_inferred", "size": 12.172671684965376, "flags": []}, {"id": "q.5496c7a396", "phrase": "sbab vs nordea privatlån", "x": 0.562901613687375, "y": 0.555591590061223, "cluster_id": "B", "intent": "commercial", "perspective": "neutral", "confidence": 0.45, "provenance": "llm_inferred", "size": 10.711426122701463, "flags": []}, {"id": "q.b5806eb8c0", "phrase": "jämför privatlån", "x": 0.5351585907361375, "y": 0.4280082129845415, "cluster_id": "B", "intent": "commercial", "perspective": "advisor", "confidence": 0.47, "provenance": "llm_inferred", "size": 10.711427542722062, "flags": []}, {"id": "q.0359dab939", "phrase": "privatlån recension", "x": 0.5805233087368598, "y": 0.378576144710783, "cluster_id": "B", "intent": "commercial", "perspective": "advisor", "confidence": 0.47, "provenance": "llm_inferred", "size": 10.711427542722062, "flags": []}, {"id": "q.c2aa120b30", "phrase": "privatlån omdöme", "x": 0.5129058103642673, "y": 0.36489030750582235, "cluster_id": "B", "intent": "commercial", "perspective": "advisor", "confidence": 0.47, "provenance": "llm_inferred", "size": 10.711427542722062, "flags": []}, {"id": "q.a8430d4669", "phrase": "topplista privatlån", "x": 0.5281504904521048, "y": 0.41786145815110337, "cluster_id": "B", "intent": "commercial", "perspective": "advisor", "confidence": 0.47, "provenance": "llm_inferred", "size": 10.711427542722062, "flags": []}, {"id": "q.74a1452dd2", "phrase": "bästa privatlån", "x": 0.5787290432464167, "y": 0.4200514050712929, "cluster_id": "B", "intent": "commercial", "perspective": "advisor", "confidence": 0.47, "provenance": "llm_inferred", "size": 10.71890351736995, "flags": []}, {"id": "q.7c342c0c9e", "phrase": "privatlån jämförelse ränta", "x": 0.5727338404727015, "y": 0.40154715060292445, "cluster_id": "B", "intent": "commercial", "perspective": "advisor", "confidence": 0.55, "provenance": "llm_inferred", "size": 10.554026729763997, "flags": []}, {"id": "q.8859e2bd00", "phrase": "ica banken vs seb privatlån", "x": 0.5483479399137078, "y": 0.5485093077548103, "cluster_id": "B", "intent": "commercial", "perspective": "neutral", "confidence": 0.45, "provenance": "llm_inferred", "size": 10.62851651188666, "flags": []}, {"id": "q.cfe6364ece", "phrase": "handelsbanken vs swedbank privatlån", "x": 0.5198409995087052, "y": 0.5419964692257337, "cluster_id": "B", "intent": "commercial", "perspective": "neutral", "confidence": 0.45, "provenance": "llm_inferred", "size": 10.711426122701463, "flags": []}, {"id": "q.8e639624b7", "phrase": "hur fungerar privatlån 63", "x": 0.2211974524290295, "y": 0.5374567251157614, "cluster_id": "A", "intent": "howto", "perspective": "neutral", "confidence": 0.45, "provenance": "llm_inferred", "size": 9.913059628882374, "flags": ["⚠ wrong_cluster_for_anchor"]}, {"id": "q.353c290d48", "phrase": "privatlån avbetalningsplan", "x": 0.0, "y": 0.562740873147906, "cluster_id": "A", "intent": "informational", "perspective": "neutral", "confidence": 0.45, "provenance": "llm_inferred", "size": 9.901427542722061, "flags": ["⚠ wrong_cluster_for_anchor"]}, {"id": "q.58049a64fc", "phrase": "finansinspektionen privatlån", "x": 0.02028371324303646, "y": 0.5705820179312914, "cluster_id": "A", "intent": "informational", "perspective": "neutral", "confidence": 0.45, "provenance": "llm_inferred", "size": 9.901427542722061, "flags": ["⚠ wrong_cluster_for_anchor"]}, {"id": "q.4e6c123a16", "phrase": "snabbt privatlån", "x": 0.02511366460125746, "y": 0.5555328527385213, "cluster_id": "A", "intent": "informational", "perspective": "neutral", "confidence": 0.45, "provenance": "llm_inferred", "size": 9.906969824100093, "flags": ["⚠ wrong_cluster_for_anchor"]}, {"id": "q.abe8e9fa1d", "phrase": "effektiv ränta privatlån", "x": 0.03697115475241355, "y": 0.8816748556289065, "cluster_id": "A", "intent": "informational", "perspective": "provider", "confidence": 0.45, "provenance": "llm_inferred", "size": 10.555432068625063, "flags": []}, {"id": "q.9169aeb5b1", "phrase": "privatlån direkt utbetalning", "x": 0.018093333537246414, "y": 0.5394469196976738, "cluster_id": "A", "intent": "informational", "perspective": "neutral", "confidence": 0.45, "provenance": "llm_inferred", "size": 9.7423022688148, "flags": ["⚠ wrong_cluster_for_anchor"]}, {"id": "q.acf6c8a722", "phrase": "amortera privatlån snabbare", "x": 0.025519739665444883, "y": 0.5144376112717292, "cluster_id": "A", "intent": "informational", "perspective": "neutral", "confidence": 0.45, "provenance": "llm_inferred", "size": 9.7423022688148, "flags": ["⚠ wrong_cluster_for_anchor"]}, {"id": "q.5d574039ef", "phrase": "räntetak privatlån sverige", "x": 0.016247111180854753, "y": 0.5864790093518046, "cluster_id": "A", "intent": "informational", "perspective": "neutral", "confidence": 0.45, "provenance": "llm_inferred", "size": 9.7423022688148, "flags": ["⚠ wrong_cluster_for_anchor"]}, {"id": "q.80a279f1de", "phrase": "privatlån ränta från", "x": 0.0, "y": 0.8431969199034378, "cluster_id": "A", "intent": "informational", "perspective": "provider", "confidence": 0.45, "provenance": "llm_inferred", "size": 10.555575482717916, "flags": []}, {"id": "q.be065f9979", "phrase": "privatlån låg ränta", "x": 0.021172503265825215, "y": 0.8317166472276944, "cluster_id": "A", "intent": "informational", "perspective": "provider", "confidence": 0.45, "provenance": "llm_inferred", "size": 10.556715757569702, "flags": []}, {"id": "q.c64a7a6725", "phrase": "konsumentkreditlagen privatlån", "x": 0.0019811344803266984, "y": 0.6133199505888205, "cluster_id": "A", "intent": "informational", "perspective": "regulator", "confidence": 0.45, "provenance": "llm_inferred", "size": 9.09142754272206, "flags": ["⚠ wrong_cluster_for_anchor"]}, {"id": "q.b2d6969a63", "phrase": "villkor privatlån", "x": 0.012231844545396005, "y": 0.6492913570905318, "cluster_id": "A", "intent": "informational", "perspective": "regulator", "confidence": 0.45, "provenance": "llm_inferred", "size": 9.09142754272206, "flags": ["⚠ wrong_cluster_for_anchor"]}, {"id": "q.c345351643", "phrase": "kreditprövning privatlån krav", "x": 0.0, "y": 0.638944265066866, "cluster_id": "A", "intent": "informational", "perspective": "regulator", "confidence": 0.45, "provenance": "llm_inferred", "size": 8.932302268814801, "flags": ["⚠ wrong_cluster_for_anchor"]}, {"id": "q.d1f5accf4e", "phrase": "regler för privatlån", "x": 0.03468181311960374, "y": 0.6262139855362974, "cluster_id": "A", "intent": "informational", "perspective": "regulator", "confidence": 0.47, "provenance": "llm_inferred", "size": 8.933524233130859, "flags": ["⚠ wrong_cluster_for_anchor"]}, {"id": "q.bfadfcf0aa", "phrase": "utan uc privatlån ränta", "x": 0.0, "y": 0.8316091010956115, "cluster_id": "A", "intent": "informational", "perspective": "provider", "confidence": 0.45, "provenance": "llm_inferred", "size": 10.446412139179312, "flags": []}, {"id": "q.b4fd99d74b", "phrase": "med låg ränta privatlån 800000", "x": 0.0, "y": 0.8768379081755033, "cluster_id": "A", "intent": "informational", "perspective": "provider", "confidence": 0.45, "provenance": "llm_inferred", "size": 11.445539220090536, "flags": []}, {"id": "q.04998569e4", "phrase": "bästa ränta privatlån", "x": 0.5379283259687779, "y": 0.3960246432283951, "cluster_id": "B", "intent": "commercial", "perspective": "advisor", "confidence": 0.47, "provenance": "llm_inferred", "size": 10.557116877479963, "flags": []}, {"id": "q.9aeab749aa", "phrase": "billigast privatlån ränta", "x": 0.5370870022352522, "y": 0.8331453440019734, "cluster_id": "B", "intent": "commercial", "perspective": "provider", "confidence": 0.47, "provenance": "llm_inferred", "size": 11.638895916509902, "flags": []}, {"id": "q.20f3b3bc04", "phrase": "bästa privatlån 800000", "x": 0.5728597476293472, "y": 0.4128775137413474, "cluster_id": "B", "intent": "commercial", "perspective": "advisor", "confidence": 0.47, "provenance": "llm_inferred", "size": 12.118598067297548, "flags": []}, {"id": "q.bbc57c2e23", "phrase": "billigast privatlån regler", "x": 0.5388839183628755, "y": 0.6197322477422963, "cluster_id": "B", "intent": "commercial", "perspective": "regulator", "confidence": 0.47, "provenance": "llm_inferred", "size": 10.017845239846539, "flags": ["⚠ wrong_cluster_for_anchor"]}], "edges": [{"from": "q.cc09275a63", "to": "q.5ddb3d4bab", "strength": 0.3641284887827918, "types": ["shared_entity", "intent_shift", "perspective_shift"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.5ddb3d4bab", "strength": 0.3641284887827918, "types": ["shared_entity", "intent_shift", "perspective_shift"], "direction": "bidirectional", "intent_shift": "transactional->commercial", "perspective_shift": "provider->neutral", "confidence": 0.45, "bridge_statement": "Det handlar om samma ämne men med en annan typ av mål (t.ex. lära sig vs agera).", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.20", "confidence": 0.45, "value": 0.195642443913959}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.40", "confidence": 0.45, "value": 0.4}]}}, {"from": "q.cc09275a63", "to": "q.e34b0e174a", "strength": 0.35467148524288644, "types": ["shared_entity", "intent_shift", "perspective_shift"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.e34b0e174a", "strength": 0.35467148524288644, "types": ["shared_entity", "intent_shift", "perspective_shift"], "direction": "bidirectional", "intent_shift": "transactional->commercial", "perspective_shift": "provider->neutral", "confidence": 0.45, "bridge_statement": "Det handlar om samma ämne men med en annan typ av mål (t.ex. lära sig vs agera).", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.15", "confidence": 0.45, "value": 0.14835742621443218}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.40", "confidence": 0.45, "value": 0.4}]}}, {"from": "q.cc09275a63", "to": "q.07c6ad203f", "strength": 0.3429262047202986, "types": ["shared_entity"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.07c6ad203f", "strength": 0.3429262047202986, "types": ["shared_entity"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.47, "bridge_statement": "Direkt relaterat inom samma ämne och tolkning.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.47, "value": 0.006297690268159803}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.17", "confidence": 0.47, "value": 0.16666666666666666}]}}, {"from": "q.cc09275a63", "to": "q.dbcaee1c6a", "strength": 0.3429262047202986, "types": ["shared_entity"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.dbcaee1c6a", "strength": 0.3429262047202986, "types": ["shared_entity"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.47, "bridge_statement": "Direkt relaterat inom samma ämne och tolkning.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.47, "value": 0.006297690268159803}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.17", "confidence": 0.47, "value": 0.16666666666666666}]}}, {"from": "q.cc09275a63", "to": "q.5496c7a396", "strength": 0.26174589570563683, "types": ["comparative", "intent_shift", "perspective_shift"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.5496c7a396", "strength": 0.26174589570563683, "types": ["comparative", "intent_shift", "perspective_shift"], "direction": "bidirectional", "intent_shift": "transactional->commercial", "perspective_shift": "provider->neutral", "confidence": 0.45, "bridge_statement": "Detta är en jämförelsevariant av samma ämne, där användaren vill välja mellan alternativ.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.45, "value": 0.005158049956755726}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.14", "confidence": 0.45, "value": 0.14285714285714285}]}}, {"from": "q.cc09275a63", "to": "q.b5806eb8c0", "strength": 0.26174597459567006, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.b5806eb8c0", "strength": 0.26174597459567006, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->commercial", "perspective_shift": "provider->advisor", "confidence": 0.47, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.47, "value": 0.008729872978350149}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.20", "confidence": 0.47, "value": 0.2}]}}, {"from": "q.cc09275a63", "to": "q.0359dab939", "strength": 0.26174597459567006, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.0359dab939", "strength": 0.26174597459567006, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->commercial", "perspective_shift": "provider->advisor", "confidence": 0.47, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.47, "value": 0.008729872978350149}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.20", "confidence": 0.47, "value": 0.2}]}}, {"from": "q.cc09275a63", "to": "q.c2aa120b30", "strength": 0.26174597459567006, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.c2aa120b30", "strength": 0.26174597459567006, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->commercial", "perspective_shift": "provider->advisor", "confidence": 0.47, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.47, "value": 0.008729872978350149}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.20", "confidence": 0.47, "value": 0.2}]}}, {"from": "q.cc09275a63", "to": "q.a8430d4669", "strength": 0.26174597459567006, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.a8430d4669", "strength": 0.26174597459567006, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->commercial", "perspective_shift": "provider->advisor", "confidence": 0.47, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.47, "value": 0.008729872978350149}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.20", "confidence": 0.47, "value": 0.2}]}}, {"from": "q.cc09275a63", "to": "q.74a1452dd2", "strength": 0.2621613065205528, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.74a1452dd2", "strength": 0.2621613065205528, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->commercial", "perspective_shift": "provider->advisor", "confidence": 0.47, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.47, "value": 0.01080653260276385}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.20", "confidence": 0.47, "value": 0.2}]}}, {"from": "q.cc09275a63", "to": "q.7c342c0c9e", "strength": 0.2530014849868888, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.7c342c0c9e", "strength": 0.2530014849868888, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->commercial", "perspective_shift": "provider->advisor", "confidence": 0.55, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.55, "value": 0.006674091601110747}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.17", "confidence": 0.55, "value": 0.16666666666666666}]}}, {"from": "q.cc09275a63", "to": "q.8859e2bd00", "strength": 0.2571398062159256, "types": ["comparative", "intent_shift", "perspective_shift"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.8859e2bd00", "strength": 0.2571398062159256, "types": ["comparative", "intent_shift", "perspective_shift"], "direction": "bidirectional", "intent_shift": "transactional->commercial", "perspective_shift": "provider->neutral", "confidence": 0.45, "bridge_statement": "Detta är en jämförelsevariant av samma ämne, där användaren vill välja mellan alternativ.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.00", "confidence": 0.45, "value": 0.0044490310796280585}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.12", "confidence": 0.45, "value": 0.125}]}}, {"from": "q.cc09275a63", "to": "q.cfe6364ece", "strength": 0.26174589570563683, "types": ["comparative", "intent_shift", "perspective_shift"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.cfe6364ece", "strength": 0.26174589570563683, "types": ["comparative", "intent_shift", "perspective_shift"], "direction": "bidirectional", "intent_shift": "transactional->commercial", "perspective_shift": "provider->neutral", "confidence": 0.45, "bridge_statement": "Detta är en jämförelsevariant av samma ämne, där användaren vill välja mellan alternativ.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.45, "value": 0.005158049956755726}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.14", "confidence": 0.45, "value": 0.14285714285714285}]}}, {"from": "q.cc09275a63", "to": "q.8e639624b7", "strength": 0.21739220160457637, "types": ["task_chain", "intent_shift", "perspective_shift"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.8e639624b7", "strength": 0.21739220160457637, "types": ["task_chain", "intent_shift", "perspective_shift"], "direction": "bidirectional", "intent_shift": "transactional->howto", "perspective_shift": "provider->neutral", "confidence": 0.45, "bridge_statement": "Detta är ett närliggande steg i beslutsprocessen som ofta kommer före eller efter huvudfrågan.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.45, "value": 0.008389579451453308}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.14", "confidence": 0.45, "value": 0.14285714285714285}]}}, {"from": "q.cc09275a63", "to": "q.353c290d48", "strength": 0.21674597459567002, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.353c290d48", "strength": 0.21674597459567002, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->informational", "perspective_shift": "provider->neutral", "confidence": 0.45, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.45, "value": 0.008729872978350149}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.20", "confidence": 0.45, "value": 0.2}]}}, {"from": "q.cc09275a63", "to": "q.58049a64fc", "strength": 0.21674597459567002, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.58049a64fc", "strength": 0.21674597459567002, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->informational", "perspective_shift": "provider->neutral", "confidence": 0.45, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.45, "value": 0.008729872978350149}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.20", "confidence": 0.45, "value": 0.2}]}}, {"from": "q.cc09275a63", "to": "q.4e6c123a16", "strength": 0.21705387911667184, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.4e6c123a16", "strength": 0.21705387911667184, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->informational", "perspective_shift": "provider->neutral", "confidence": 0.45, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.45, "value": 0.010269395583359254}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.20", "confidence": 0.45, "value": 0.2}]}}, {"from": "q.cc09275a63", "to": "q.abe8e9fa1d", "strength": 0.2530795593680591, "types": ["intent_shift"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.abe8e9fa1d", "strength": 0.2530795593680591, "types": ["intent_shift"], "direction": "bidirectional", "intent_shift": "transactional->informational", "perspective_shift": "", "confidence": 0.45, "bridge_statement": "Det handlar om samma ämne men med en annan typ av mål (t.ex. lära sig vs agera).", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.45, "value": 0.007064463506962265}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.17", "confidence": 0.45, "value": 0.16666666666666666}]}}, {"from": "q.cc09275a63", "to": "q.9169aeb5b1", "strength": 0.20790568160082223, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.9169aeb5b1", "strength": 0.20790568160082223, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->informational", "perspective_shift": "provider->neutral", "confidence": 0.45, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.45, "value": 0.006195074670777938}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.17", "confidence": 0.45, "value": 0.16666666666666666}]}}, {"from": "q.cc09275a63", "to": "q.acf6c8a722", "strength": 0.20790568160082223, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.acf6c8a722", "strength": 0.20790568160082223, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->informational", "perspective_shift": "provider->neutral", "confidence": 0.45, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.45, "value": 0.006195074670777938}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.17", "confidence": 0.45, "value": 0.16666666666666666}]}}, {"from": "q.cc09275a63", "to": "q.5d574039ef", "strength": 0.20790568160082223, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.5d574039ef", "strength": 0.20790568160082223, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->informational", "perspective_shift": "provider->neutral", "confidence": 0.45, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.45, "value": 0.006195074670777938}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.17", "confidence": 0.45, "value": 0.16666666666666666}]}}, {"from": "q.cc09275a63", "to": "q.80a279f1de", "strength": 0.253087526817662, "types": ["intent_shift"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.80a279f1de", "strength": 0.253087526817662, "types": ["intent_shift"], "direction": "bidirectional", "intent_shift": "transactional->informational", "perspective_shift": "", "confidence": 0.45, "bridge_statement": "Det handlar om samma ämne men med en annan typ av mål (t.ex. lära sig vs agera).", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.45, "value": 0.007104300754976746}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.17", "confidence": 0.45, "value": 0.16666666666666666}]}}, {"from": "q.cc09275a63", "to": "q.be065f9979", "strength": 0.25315087542053893, "types": ["intent_shift"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.be065f9979", "strength": 0.25315087542053893, "types": ["intent_shift"], "direction": "bidirectional", "intent_shift": "transactional->informational", "perspective_shift": "", "confidence": 0.45, "bridge_statement": "Det handlar om samma ämne men med en annan typ av mål (t.ex. lära sig vs agera).", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.45, "value": 0.007421043769361199}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.17", "confidence": 0.45, "value": 0.16666666666666666}]}}, {"from": "q.cc09275a63", "to": "q.c64a7a6725", "strength": 0.17174597459567004, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.c64a7a6725", "strength": 0.17174597459567004, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->informational", "perspective_shift": "provider->regulator", "confidence": 0.45, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.45, "value": 0.008729872978350149}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.20", "confidence": 0.45, "value": 0.2}]}}, {"from": "q.cc09275a63", "to": "q.b2d6969a63", "strength": 0.17174597459567004, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.b2d6969a63", "strength": 0.17174597459567004, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->informational", "perspective_shift": "provider->regulator", "confidence": 0.45, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.45, "value": 0.008729872978350149}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.20", "confidence": 0.45, "value": 0.2}]}}, {"from": "q.cc09275a63", "to": "q.c345351643", "strength": 0.16290568160082225, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.c345351643", "strength": 0.16290568160082225, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->informational", "perspective_shift": "provider->regulator", "confidence": 0.45, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.45, "value": 0.006195074670777938}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.17", "confidence": 0.45, "value": 0.16666666666666666}]}}, {"from": "q.cc09275a63", "to": "q.d1f5accf4e", "strength": 0.16297356850726993, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.d1f5accf4e", "strength": 0.16297356850726993, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->informational", "perspective_shift": "provider->regulator", "confidence": 0.47, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.47, "value": 0.006534509203016364}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.17", "confidence": 0.47, "value": 0.16666666666666666}]}}, {"from": "q.cc09275a63", "to": "q.bfadfcf0aa", "strength": 0.2470228966210729, "types": ["intent_shift"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.bfadfcf0aa", "strength": 0.2470228966210729, "types": ["intent_shift"], "direction": "bidirectional", "intent_shift": "transactional->informational", "perspective_shift": "", "confidence": 0.45, "bridge_statement": "Det handlar om samma ämne men med en annan typ av mål (t.ex. lära sig vs agera).", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.45, "value": 0.006543054533935992}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.14", "confidence": 0.45, "value": 0.14285714285714285}]}}, {"from": "q.cc09275a63", "to": "q.b4fd99d74b", "strength": 0.30252995667169646, "types": ["intent_shift"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.b4fd99d74b", "strength": 0.30252995667169646, "types": ["intent_shift"], "direction": "bidirectional", "intent_shift": "transactional->informational", "perspective_shift": "", "confidence": 0.45, "bridge_statement": "Det handlar om samma ämne men med en annan typ av mål (t.ex. lära sig vs agera).", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.11", "confidence": 0.45, "value": 0.10550692621562506}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.29", "confidence": 0.45, "value": 0.2857142857142857}]}}, {"from": "q.cc09275a63", "to": "q.04998569e4", "strength": 0.2531731598599979, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.04998569e4", "strength": 0.2531731598599979, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->commercial", "perspective_shift": "provider->advisor", "confidence": 0.47, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.47, "value": 0.00753246596665631}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.17", "confidence": 0.47, "value": 0.16666666666666666}]}}, {"from": "q.cc09275a63", "to": "q.9aeab749aa", "strength": 0.3132719953616613, "types": ["intent_shift"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.9aeab749aa", "strength": 0.3132719953616613, "types": ["intent_shift"], "direction": "bidirectional", "intent_shift": "transactional->commercial", "perspective_shift": "", "confidence": 0.47, "bridge_statement": "Det handlar om samma ämne men med en annan typ av mål (t.ex. lära sig vs agera).", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.47, "value": 0.0080266434749732}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.17", "confidence": 0.47, "value": 0.16666666666666666}]}}, {"from": "q.cc09275a63", "to": "q.20f3b3bc04", "strength": 0.3399221148498638, "types": ["shared_entity", "intent_shift", "perspective_shift"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.20f3b3bc04", "strength": 0.3399221148498638, "types": ["shared_entity", "intent_shift", "perspective_shift"], "direction": "bidirectional", "intent_shift": "transactional->commercial", "perspective_shift": "provider->advisor", "confidence": 0.47, "bridge_statement": "Det handlar om samma ämne men med en annan typ av mål (t.ex. lära sig vs agera).", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.15", "confidence": 0.47, "value": 0.1496105742493189}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.40", "confidence": 0.47, "value": 0.4}]}}, {"from": "q.cc09275a63", "to": "q.bbc57c2e23", "strength": 0.2232136244359188, "types": ["intent_shift", "perspective_shift", "bridge"], "synapse_card": {"from_id": "q.cc09275a63", "to_id": "q.bbc57c2e23", "strength": 0.2232136244359188, "types": ["intent_shift", "perspective_shift", "bridge"], "direction": "bidirectional", "intent_shift": "transactional->commercial", "perspective_shift": "provider->regulator", "confidence": 0.47, "bridge_statement": "Det delar grundämnet men handlar om en annan uppgift/roll, vilket gör kopplingen svagare för ankartext.", "evidence": [{"source": "embeddings", "kind": "tfidf_cosine", "summary": "Textlikhet (proxy) = 0.01", "confidence": 0.47, "value": 0.007734788846260694}, {"source": "llm_inferred", "kind": "entity_overlap", "summary": "Entitetsöverlapp (proxy) = 0.17", "confidence": 0.47, "value": 0.16666666666666666}]}}], "clusters": [{"id": "A", "label": "A: informational · neutral", "color": "#e53e3e", "node_ids": ["q.8e639624b7", "q.353c290d48", "q.58049a64fc", "q.4e6c123a16", "q.abe8e9fa1d", "q.9169aeb5b1", "q.acf6c8a722", "q.5d574039ef", "q.80a279f1de", "q.be065f9979", "q.c64a7a6725", "q.b2d6969a63", "q.c345351643", "q.d1f5accf4e", "q.bfadfcf0aa", "q.b4fd99d74b"], "dominant_intent": "informational", "dominant_perspective": "neutral", "hub_entities": ["privatlån", "ränta", "hur", "fungerar", "avbetalningsplan"], "centroid": {"x": 0.027093341551277166, "y": 0.6662175624730223}}, {"id": "B", "label": "B: Jämföra / utvärdera", "color": "#ed8936", "node_ids": ["q.5ddb3d4bab", "q.e34b0e174a", "q.5496c7a396", "q.b5806eb8c0", "q.0359dab939", "q.c2aa120b30", "q.a8430d4669", "q.74a1452dd2", "q.7c342c0c9e", "q.8859e2bd00", "q.cfe6364ece", "q.04998569e4", "q.9aeab749aa", "q.20f3b3bc04", "q.bbc57c2e23"], "dominant_intent": "commercial", "dominant_perspective": "advisor", "hub_entities": ["privatlån", "vs", "ränta", "alternativ", "till"], "centroid": {"x": 0.5444136325735011, "y": 0.4919053939749888}}, {"id": "C", "label": "C: Ansöka / erbjudande", "color": "#4299e1", "node_ids": ["q.07c6ad203f", "q.dbcaee1c6a"], "dominant_intent": "transactional", "dominant_perspective": "provider", "hub_entities": ["privatlån", "online", "om"], "centroid": {"x": 0.8729271629412955, "y": 0.8378806322226022}}], "legend": {"intent_axis": "informational -> transactional", "perspective_axis": "seeker -> provider", "strength_buckets": [{"min": 0.0, "max": 0.49, "label": "weak"}, {"min": 0.5, "max": 0.69, "label": "medium"}, {"min": 0.7, "max": 1.0, "label": "strong"}]}, "warnings": []};
+
+const svg = document.getElementById('svg');
+const tooltip = document.getElementById('tooltip');
+const textarea = document.getElementById('json');
+const seedLine = document.getElementById('seedLine');
+const legendEl = document.getElementById('legend');
+
+function clearSvg(){ while(svg.firstChild) svg.removeChild(svg.firstChild); }
+
+function el(name){ return document.createElementNS('http://www.w3.org/2000/svg', name); }
+
+function toX(x){ const W = window.innerWidth - 340; return 40 + x * (W - 80); }
+function toY(y){ const H = window.innerHeight - 52; return 40 + y * (H - 80); }
+
+function strengthColor(s){
+  if (s >= 0.70) return '#68d391';
+  if (s >= 0.50) return '#ecc94b';
+  return '#fc8181';
+}
+
+function renderLegend(graph){
+  legendEl.innerHTML = '<h2 style="margin:0 0 8px;font-size:12px;color:#a0aec0;text-transform:uppercase;letter-spacing:1px">Kluster</h2>';
+  graph.clusters.forEach(c=>{
+    const row = document.createElement('div');
+    row.className='legend-item';
+    row.innerHTML = `<span class="dot" style="background:${c.color}"></span>
+      <span>${c.label}</span>`;
+    legendEl.appendChild(row);
+  });
+}
+
+function showTooltip(evt, node, synapse){
+  const rect = svg.getBoundingClientRect();
+  const x = evt.clientX - rect.left;
+  const y = evt.clientY - rect.top;
+
+  const s = synapse?.strength ?? node.confidence ?? 0;
+  const col = strengthColor(s);
+  const card = synapse?.synapse_card;
+
+  tooltip.innerHTML = `
+    <div class="t-title">${node.phrase}</div>
+    <div class="t-meta">
+      <span class="tag">${node.intent}</span>
+      <span class="tag">${node.perspective}</span>
+      <span class="tag" style="color:${col}">strength ${s.toFixed(2)}</span>
+      <span class="tag">${node.provenance}</span>
+    </div>
+    <div class="t-card">${card ? card.bridge_statement : '—'}</div>
+  `;
+  let tx = x + 14, ty = y + 10;
+  const maxW = 340, maxH = 180;
+  if (tx + maxW > rect.width) tx = x - maxW - 14;
+  if (ty + maxH > rect.height) ty = rect.height - maxH - 12;
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = ty + 'px';
+  tooltip.classList.add('visible');
+}
+
+function hideTooltip(){ tooltip.classList.remove('visible'); }
+
+function renderGraph(graph){
+  clearSvg();
+  seedLine.textContent = `Seed: "${graph.seed.phrase}"`;
+
+  // cluster zones
+  graph.clusters.forEach(c=>{
+    const e = el('ellipse');
+    e.setAttribute('cx', toX(c.centroid.x));
+    e.setAttribute('cy', toY(c.centroid.y));
+    e.setAttribute('rx', 130);
+    e.setAttribute('ry', 95);
+    e.setAttribute('fill', c.color);
+    e.setAttribute('opacity', 0.08);
+    svg.appendChild(e);
+
+    const t = el('text');
+    t.setAttribute('x', toX(c.centroid.x));
+    t.setAttribute('y', toY(c.centroid.y) - 100);
+    t.setAttribute('text-anchor','middle');
+    t.setAttribute('fill', c.color);
+    t.setAttribute('opacity', 0.7);
+    t.setAttribute('font-size','11px');
+    t.setAttribute('font-weight','700');
+    t.textContent = c.label;
+    svg.appendChild(t);
+  });
+
+  // edges
+  graph.edges.forEach(ed=>{
+    if (ed.strength < 0.40) return;
+    const a = graph.nodes.find(n=>n.id===ed.from) || (graph.seed.id===ed.from? graph.seed : null);
+    const b = graph.nodes.find(n=>n.id===ed.to) || (graph.seed.id===ed.to? graph.seed : null);
+    if (!a||!b) return;
+
+    const l = el('line');
+    l.setAttribute('x1', toX(a.x)); l.setAttribute('y1', toY(a.y));
+    l.setAttribute('x2', toX(b.x)); l.setAttribute('y2', toY(b.y));
+    l.setAttribute('stroke', strengthColor(ed.strength));
+    l.setAttribute('stroke-width', Math.max(1, ed.strength*3));
+    l.setAttribute('opacity', 0.18);
+    svg.appendChild(l);
+  });
+
+  // seed node
+  const sg = el('g');
+  const pulse = el('circle');
+  pulse.setAttribute('cx', toX(graph.seed.x));
+  pulse.setAttribute('cy', toY(graph.seed.y));
+  pulse.setAttribute('r', 20);
+  pulse.setAttribute('fill', 'none');
+  pulse.setAttribute('stroke', '#fff');
+  pulse.setAttribute('stroke-width', '2');
+  pulse.setAttribute('opacity', '0.35');
+  sg.appendChild(pulse);
+
+  const sc = el('circle');
+  sc.setAttribute('cx', toX(graph.seed.x));
+  sc.setAttribute('cy', toY(graph.seed.y));
+  sc.setAttribute('r', 14);
+  sc.setAttribute('fill', '#e53e3e');
+  sc.setAttribute('opacity', '0.9');
+  sc.setAttribute('stroke', '#fff');
+  sc.setAttribute('stroke-width','2');
+  sg.appendChild(sc);
+
+  const st = el('text');
+  st.setAttribute('x', toX(graph.seed.x));
+  st.setAttribute('y', toY(graph.seed.y)+5);
+  st.setAttribute('text-anchor','middle');
+  st.setAttribute('fill','#fff');
+  st.setAttribute('font-size','14px');
+  st.textContent='★';
+  sg.appendChild(st);
+
+  svg.appendChild(sg);
+
+  // nodes
+  const byId = new Map(graph.nodes.map(n=>[n.id,n]));
+  graph.nodes.forEach(n=>{
+    const g = el('g');
+
+    const c = graph.clusters.find(x=>x.id===n.cluster_id);
+    const fill = c ? c.color : '#4299e1';
+    const r = Math.max(6, n.size);
+
+    const circle = el('circle');
+    circle.setAttribute('cx', toX(n.x));
+    circle.setAttribute('cy', toY(n.y));
+    circle.setAttribute('r', r);
+    circle.setAttribute('fill', fill);
+    circle.setAttribute('opacity', Math.max(0.3, n.confidence));
+    circle.setAttribute('stroke', '#0f1117');
+    circle.setAttribute('stroke-width', '1');
+    g.appendChild(circle);
+
+    const label = el('text');
+    label.setAttribute('x', toX(n.x));
+    label.setAttribute('y', toY(n.y)+r+14);
+    label.setAttribute('text-anchor','middle');
+    label.setAttribute('fill','#a0aec0');
+    label.setAttribute('font-size','10px');
+    label.textContent = n.phrase.length>28 ? (n.phrase.slice(0,26)+'…') : n.phrase;
+    g.appendChild(label);
+
+    // find synapse edge to seed if exists
+    const syn = graph.edges.find(ed => (ed.from===graph.seed.id && ed.to===n.id) || (ed.to===graph.seed.id && ed.from===n.id));
+
+    g.addEventListener('mouseenter', (evt)=>showTooltip(evt,n,syn));
+    g.addEventListener('mouseleave', hideTooltip);
+
+    svg.appendChild(g);
+  });
+
+  renderLegend(graph);
+}
+
+function safeParse(txt){
+  try { return JSON.parse(txt); } catch(e){ return null; }
+}
+
+textarea.value = JSON.stringify(sample, null, 2);
+document.getElementById('render').addEventListener('click', ()=>{
+  const g = safeParse(textarea.value);
+  if(!g){ alert('Invalid JSON'); return; }
+  renderGraph(g);
+});
+
+window.addEventListener('resize', ()=>{
+  const g = safeParse(textarea.value);
+  if(g) renderGraph(g);
+});
+
+// initial
+renderGraph(sample);
+</script>
+</body>
+</html>

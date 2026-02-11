@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SIE-X Dev Console Config",
+  "type": "object",
+  "required": ["version", "status", "tasks", "surfaces", "notes"],
+  "properties": {
+    "version": { "type": "string" },
+    "updated_at": { "type": "string" },
+    "status": {
+      "type": "object",
+      "required": ["refresh_interval_ms", "timeout_ms"],
+      "properties": {
+        "refresh_interval_ms": { "type": "number", "minimum": 1000 },
+        "timeout_ms": { "type": "number", "minimum": 200 }
+      }
+    },
+    "control_api": {
+      "type": "object",
+      "properties": {
+        "base_url": { "type": "string" },
+        "status_path": { "type": "string" },
+        "command_path": { "type": "string" }
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "description", "vscode_task"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "vscode_task": { "type": "string" },
+          "command": { "type": "string" },
+          "variant": { "type": "string", "enum": ["primary", "ghost", "default"] }
+        }
+      }
+    },
+    "surfaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "description", "url"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "url": { "type": "string" },
+          "health": { "type": "string" },
+          "tag": { "type": "string" },
+          "open_on_launch": { "type": "boolean" }
+        }
+      }
+    },
+    "shortcuts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "url"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "url": { "type": "string" },
+          "variant": { "type": "string", "enum": ["primary", "ghost", "default"] }
+        }
+      }
+    },
+    "notes": {
+      "type": "object",
+      "properties": {
+        "tasks": { "type": "string" },
+        "surfaces": { "type": "string" },
+        "reminder": { "type": "string" }
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "aliases": {
+    "taa plan": ["entity-reconciler"],
+    "taa run competitive": ["entity-reconciler", "competitive-modeler"],
+    "taa run forecast": ["first-party-ingest", "competitive-modeler", "impact-forecaster"],
+    "taa run schema": ["entity-reconciler", "schema-compiler"],
+    "taa run quality": ["quality-harness"],
+    "taa run links": ["render-crawler", "link-graph-analytics"],
+    "taa run deploy": ["delivery-devops"],
+    "taa run monitor": ["monitoring-agent"]
+  },
+  "formats": ["md", "json", "csv", "yaml"],
+  "modes": ["offline", "online"]
+}

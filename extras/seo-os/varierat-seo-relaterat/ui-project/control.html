@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SIE-X Dev Console</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">SIE-X</div>
+      <div class="tag">Dev console for live demos</div>
+    </div>
+    <div class="top-actions">
+      <a class="chip ghost" href="index.html">Back to dashboard</a>
+      <a class="chip" href="http://localhost:5173" target="_blank" rel="noopener">Open knowledge base</a>
+    </div>
+  </header>
+
+  <div class="layout single">
+    <main class="main">
+      <section class="panel" style="--delay: 0.05s">
+        <div class="panel-head">
+          <div>
+            <h3>Launchpad</h3>
+            <span class="panel-note" data-launchpad-note>VS Code tasks</span>
+          </div>
+          <div class="status-summary" data-status-summary>
+            <span class="status-pill"><span class="dot warn"></span><span class="status-label">checking</span></span>
+            <span class="status-meta">last check --</span>
+          </div>
+        </div>
+        <div class="control-grid" data-grid="tasks"></div>
+        <div class="control-actions-row">
+          <div class="control-actions" data-grid="shortcuts"></div>
+          <div class="control-actions">
+            <button class="chip" type="button" data-action="refresh-status">Refresh status</button>
+            <button class="chip ghost" type="button" data-action="open-all">Open all surfaces</button>
+          </div>
+        </div>
+        <div class="control-feedback" data-control-feedback></div>
+        <div class="control-note" data-note="tasks"></div>
+      </section>
+
+      <section class="panel" style="--delay: 0.1s">
+        <div class="panel-head">
+          <h3>Testable surfaces</h3>
+          <span class="panel-note">What works right now</span>
+        </div>
+        <div class="control-grid" data-grid="surfaces"></div>
+        <div class="control-note" data-note="surfaces"></div>
+      </section>
+
+      <section class="panel mini" style="--delay: 0.15s">
+        <div class="mini-title">Remember</div>
+        <div class="control-note" data-note="reminder"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="control.js"></script>
+</body>
+</html>

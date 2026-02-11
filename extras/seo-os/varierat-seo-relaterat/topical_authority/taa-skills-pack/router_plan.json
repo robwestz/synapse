@@ -1,0 +1,45 @@
+{
+  "version": "1.0.0",
+  "routing": [
+    {
+      "intent": "topical_plan",
+      "match": ["taa plan", "topic plan", "cluster", "knowledge graph"],
+      "pipeline": ["entity-reconciler"],
+      "return": ["out/knowledge_graph.json", "out/topic_clusters.json", "out/content_plan.csv", "out/internal_linking.md", "out/briefs/*.md"]
+    },
+    {
+      "intent": "competitive_audit",
+      "match": ["gap", "competitive", "coverage", "serp feature"],
+      "pipeline": ["entity-reconciler", "competitive-modeler"],
+      "return": ["out/competitive/coverage_matrix.csv", "out/competitive/feature_playbook.md"]
+    },
+    {
+      "intent": "forecast_prioritize",
+      "match": ["forecast", "prioritize", "roi", "backlog"],
+      "pipeline": ["first-party-ingest", "competitive-modeler", "impact-forecaster"],
+      "return": ["out/forecast/backlog_prioritized.csv", "out/forecast/assumptions.yaml"]
+    },
+    {
+      "intent": "schema_quality",
+      "match": ["schema", "json-ld", "rich results", "validation", "quality"],
+      "pipeline": ["entity-reconciler", "schema-compiler", "quality-harness"],
+      "return": ["out/schema/validation_report.md", "out/schema/feature_scores.csv", "out/quality/quality_report.csv"]
+    },
+    {
+      "intent": "link_optimization",
+      "match": ["internal link", "link graph", "pagerank", "entropy"],
+      "pipeline": ["render-crawler", "link-graph-analytics"],
+      "return": ["out/links/graph_metrics.csv", "out/links/recommendations.md"]
+    },
+    {
+      "intent": "deploy_monitor",
+      "match": ["deploy", "publish", "monitor", "diff", "alerts"],
+      "pipeline": ["delivery-devops", "monitoring-agent"],
+      "return": ["out/deploy/manifest.json", "out/monitoring/alerts.json", "out/monitoring/diff_report.md"]
+    }
+  ],
+  "defaults": {
+    "mode": "offline",
+    "format": "md"
+  }
+}

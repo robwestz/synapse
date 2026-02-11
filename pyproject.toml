@@ -1,0 +1,9 @@
+[project]
+name = "synapse-engine"
+version = "0.3.0"
+description = "SEO intelligence: Intent x Perspective synapse maps"
+requires-python = ">=3.10"
+readme = "README.md"
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]

@@ -1,0 +1,174 @@
+{
+  "version": "1.1.0",
+  "updated_at": "2025-01-10T00:00:00Z",
+  "status": {
+    "refresh_interval_ms": 8000,
+    "timeout_ms": 1500
+  },
+  "control_api": {
+    "base_url": "",
+    "status_path": "/api/status",
+    "command_path": "/api/command"
+  },
+  "tasks": [
+    {
+      "id": "start_all",
+      "title": "Start everything",
+      "description": "Starts Knowledge Base + SIE-X API; dashboard is served by Live Server or dev-control.",
+      "vscode_task": "Dev: SIE-X + Knowledge Base",
+      "command": "start_all",
+      "variant": "primary"
+    },
+    {
+      "id": "start_siex",
+      "title": "Start SIE-X dashboard",
+      "description": "Live Server for the static dashboard (skip if using dev-control).",
+      "vscode_task": "Live Server: SIE-X dashboard",
+      "variant": "default"
+    },
+    {
+      "id": "start_kb",
+      "title": "Start Knowledge Base",
+      "description": "Vite dev server for SvelteKit tools.",
+      "vscode_task": "Knowledge Base: dev server",
+      "command": "start_kb",
+      "variant": "default"
+    },
+    {
+      "id": "start_api",
+      "title": "Start SIE-X API",
+      "description": "FastAPI minimal server on port 8000.",
+      "vscode_task": "SIE-X API: dev server",
+      "command": "start_api",
+      "variant": "default"
+    },
+    {
+      "id": "stop_all",
+      "title": "Stop everything",
+      "description": "Stops Knowledge Base + SIE-X API; stop Live Server or dev-control separately.",
+      "vscode_task": "Dev: stop all",
+      "command": "stop_all",
+      "variant": "ghost"
+    },
+    {
+      "id": "stop_siex",
+      "title": "Stop SIE-X dashboard",
+      "description": "Stops Live Server only.",
+      "vscode_task": "Live Server: Stop",
+      "variant": "ghost"
+    },
+    {
+      "id": "stop_kb",
+      "title": "Stop Knowledge Base",
+      "description": "Stops Knowledge Base on port 5173.",
+      "vscode_task": "Knowledge Base: stop",
+      "command": "stop_kb",
+      "variant": "ghost"
+    },
+    {
+      "id": "stop_api",
+      "title": "Stop SIE-X API",
+      "description": "Stops FastAPI on port 8000.",
+      "vscode_task": "SIE-X API: stop",
+      "command": "stop_api",
+      "variant": "ghost"
+    }
+  ],
+  "surfaces": [
+    {
+      "id": "siex_dashboard",
+      "title": "SIE-X dashboard",
+      "description": "Live Server static control center.",
+      "url": "http://localhost:5501",
+      "health": "data/mock.json",
+      "tag": "dashboard",
+      "open_on_launch": true
+    },
+    {
+      "id": "siex_api",
+      "title": "SIE-X API",
+      "description": "FastAPI minimal server.",
+      "url": "http://localhost:8000",
+      "health": "http://localhost:8000/health",
+      "tag": "api"
+    },
+    {
+      "id": "knowledge_base",
+      "title": "Knowledge Base",
+      "description": "Root entry for tools and reference.",
+      "url": "http://localhost:5173",
+      "health": "http://localhost:5173/api/health",
+      "tag": "root",
+      "open_on_launch": true
+    },
+    {
+      "id": "knowledge_fusion",
+      "title": "Knowledge Fusion",
+      "description": "Wikipedia + Wikidata + GitHub + Drive.",
+      "url": "http://localhost:5173/tools/knowledge-fusion",
+      "health": "http://localhost:5173/api/health",
+      "tag": "fusion"
+    },
+    {
+      "id": "claude_vault",
+      "title": "Claude Vault Explorer",
+      "description": "Scraped Claude docs index.",
+      "url": "http://localhost:5173/tools/claude-vault",
+      "health": "http://localhost:5173/api/health",
+      "tag": "vault"
+    },
+    {
+      "id": "route_planner",
+      "title": "Route Planner",
+      "description": "Live routing with OpenStreetMap + OSRM.",
+      "url": "http://localhost:5173/tools/route-planner",
+      "health": "http://localhost:5173/api/health",
+      "tag": "routing"
+    },
+    {
+      "id": "bus_optimizer",
+      "title": "Bus Optimizer",
+      "description": "School bus clustering demo.",
+      "url": "http://localhost:5173/tools/bus-optimizer",
+      "health": "http://localhost:5173/api/health",
+      "tag": "optimizer"
+    },
+    {
+      "id": "rule_engine",
+      "title": "Rule Engine",
+      "description": "Policy simulation console.",
+      "url": "http://localhost:5173/tools/rule-engine",
+      "health": "http://localhost:5173/api/health",
+      "tag": "rules"
+    },
+    {
+      "id": "reference",
+      "title": "Reference",
+      "description": "Component and schema reference library.",
+      "url": "http://localhost:5173/reference",
+      "health": "http://localhost:5173/api/health",
+      "tag": "reference"
+    }
+  ],
+  "shortcuts": [
+    {
+      "id": "kb_internal",
+      "title": "Knowledge Base (internal)",
+      "description": "Shows internal blocks.",
+      "url": "http://localhost:5173/?internal=1",
+      "variant": "default"
+    },
+    {
+      "id": "kb_user",
+      "title": "Knowledge Base (user)",
+      "description": "Hides internal blocks.",
+      "url": "http://localhost:5173/?internal=0",
+      "variant": "ghost"
+    }
+  ],
+  "notes": {
+    "tasks": "Start the local control server with dev-control.sh (serves the dashboard). Do not run Live Server at the same time (port 5501). If local control is offline, tasks open via vscode://.",
+    "surfaces": "Status checks refresh automatically. If a badge is red, start the servers.",
+    "reminder": "Knowledge Fusion uses backend env tokens. Add them in knowledge-base-svelte/.env if you want GitHub or Drive results. SIE-X API needs Python deps from Datacentre/Work-in-progress/requirements.txt."
+  }
+}

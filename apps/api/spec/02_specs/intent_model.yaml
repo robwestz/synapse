@@ -1,0 +1,49 @@
+intent_model:
+  version: "2026-02-05"
+  language: "sv"
+  market: "SE"
+
+  intents:
+    - id: informational
+      label: "Lära/förstå"
+      x_position: 0.00
+    - id: howto
+      label: "Göra/utföra"
+      x_position: 0.20
+    - id: commercial
+      label: "Utvärdera alternativ"
+      x_position: 0.55
+    - id: transactional
+      label: "Agera/köpa/ansöka"
+      x_position: 0.85
+    - id: navigational
+      label: "Hitta specifik destination"
+      x_position: 0.75
+    - id: local
+      label: "Nära mig / i [stad]"
+      x_position: 0.65
+    - id: freshness
+      label: "Tidskänsligt / senaste"
+      x_position: 0.35
+
+  modifier_rules:
+    navigational:
+      signals: ["logga in", "login", "kundtjänst", "kontakt", "app", "site:"]
+    transactional:
+      signals: ["ansök", "ansökan", "registrera", "köp", "boka", "beställ", "teckna", "prenumerera"]
+    commercial:
+      signals: ["bästa", "bäst", "topplista", "jämför", "jämförelse", "vs", "recension", "omdöme", "alternativ", "billigast"]
+    informational:
+      signals: ["vad är", "vad betyder", "fakta", "guide", "regler", "förklaring", "definition"]
+    howto:
+      signals: ["hur", "så gör du", "steg för steg", "tips", "räkna ut", "beräkna"]
+    local:
+      signals: ["nära mig", "i stockholm", "i göteborg", "öppet nu"]
+    freshness:
+      signals: ["idag", "senaste", "nyheter", "uppdatering"]
+
+  interpretation_policy:
+    # Mirrors “dominant/common/minor interpretations” thinking
+    max_common: 2
+    max_minor: 2
+    require_evidence_for_high_confidence: true

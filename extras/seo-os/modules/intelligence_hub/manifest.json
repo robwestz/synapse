@@ -1,0 +1,9 @@
+{
+  "id": "intelligence_hub",
+  "name": "Intelligence Hub",
+  "version": "1.0.0",
+  "description": "Advanced diagnostic SEO modes: Cluster Dominance, KD Exposure, Intent Gaps.",
+  "category": "Analysis",
+  "icon": "🧠",
+  "entry_point": "ui.py"
+}

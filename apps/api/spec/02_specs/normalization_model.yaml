@@ -1,0 +1,19 @@
+normalization_model:
+  version: "2026-02-05"
+  language: "sv"
+  rules:
+    lowercase: true
+    collapse_whitespace: true
+    normalize_numbers:
+      keep_amounts: true
+      strip_separators: true  # "800 000" -> "800000" (store both display+canonical)
+    diacritics: "preserve"
+
+  variant_maps:
+    # Add vertical-specific maps in packs.
+    - match: ["kasino", "casiono", "csino"]
+      replace_with: "casino"
+
+  stop_patterns:
+    - pattern: '^hur\s+'
+      note: "Used for modifier extraction, not for removing meaning."

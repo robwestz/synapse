@@ -1,0 +1,40 @@
+scoring_model:
+  version: "2026-02-05"
+
+  relevance_score:
+    components:
+      entity_overlap:
+        weight: 0.25
+      serp_overlap:
+        weight: 0.25
+      embedding_similarity:
+        weight: 0.20
+      intent_compatibility:
+        weight: 0.15
+      perspective_alignment:
+        weight: 0.15
+
+  intent_distance_matrix:
+    #                info  howto  comm   trans  nav    local  fresh
+    informational: [0.0,  0.2,   0.4,   0.6,   0.8,   0.7,   0.3]
+    howto:         [0.2,  0.0,   0.3,   0.5,   0.7,   0.6,   0.4]
+    commercial:    [0.4,  0.3,   0.0,   0.2,   0.5,   0.4,   0.3]
+    transactional: [0.6,  0.5,   0.2,   0.0,   0.4,   0.3,   0.5]
+    navigational:  [0.8,  0.7,   0.5,   0.4,   0.0,   0.6,   0.7]
+    local:         [0.7,  0.6,   0.4,   0.3,   0.6,   0.0,   0.5]
+    freshness:     [0.3,  0.4,   0.3,   0.5,   0.7,   0.5,   0.0]
+
+  mmr_selection:
+    target: 50
+    mmr_lambda: 0.75
+    constraints:
+      max_same_intent: 15
+      max_same_perspective: 12
+      max_near_duplicate: 3
+      min_bridge_phrases: 3
+      min_intents_covered: 3
+
+  thresholds:
+    edge_display_min_strength: 0.40
+    warn_distance_anchor: 0.35
+    fail_distance_anchor: 0.55

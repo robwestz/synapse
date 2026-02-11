@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Synapse Map Viewer (GraphArtifact)</title>
+  <style>
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:#0f1117;color:#e0e0e0}
+    header{padding:14px 18px;border-bottom:1px solid #22283a;display:flex;gap:12px;align-items:flex-start;justify-content:space-between}
+    header h1{margin:0;font-size:14px;color:#a0aec0;letter-spacing:.5px}
+    header .seed{margin-top:4px;font-size:12px;color:#68d391}
+    .wrap{display:grid;grid-template-columns:1fr 340px;height:calc(100vh - 52px)}
+    #stage{position:relative;overflow:hidden}
+    svg{width:100%;height:100%}
+    .panel{border-left:1px solid #22283a;padding:12px;overflow:auto}
+    .panel h2{margin:0 0 8px;font-size:12px;color:#a0aec0;text-transform:uppercase;letter-spacing:1px}
+    textarea{width:100%;height:220px;background:#0b0d12;color:#e0e0e0;border:1px solid #22283a;border-radius:8px;padding:10px;font-family:ui-monospace,Consolas,monospace;font-size:11px;line-height:1.4}
+    button{margin-top:8px;width:100%;padding:10px;border-radius:10px;border:1px solid #2d3748;background:#1a1d28;color:#e0e0e0;font-weight:600;cursor:pointer}
+    button:hover{filter:brightness(1.12)}
+    .hint{margin-top:10px;font-size:11px;line-height:1.5;color:#718096}
+    .tooltip{position:absolute;display:none;max-width:340px;background:#1a1d28;border:1px solid #2d3748;border-radius:10px;padding:12px;box-shadow:0 8px 28px rgba(0,0,0,.45);pointer-events:none}
+    .tooltip.visible{display:block}
+    .t-title{font-size:13px;color:#fff;margin:0 0 6px}
+    .t-meta{font-size:11px;color:#a0aec0;margin-bottom:8px}
+    .t-card{font-size:11px;color:#cbd5e0;background:#0f1117;border-radius:8px;padding:8px;line-height:1.45}
+    .tag{display:inline-block;padding:2px 6px;border-radius:999px;background:#2d3748;margin-right:6px;font-size:10px;color:#cbd5e0}
+    .axis{position:absolute;font-size:10px;color:#4a5568;text-transform:uppercase;letter-spacing:1.2px;font-weight:700;opacity:.9}
+    .axis.xl{left:14px;top:50%;transform:rotate(-90deg) translateX(50%);transform-origin:left}
+    .axis.xr{right:14px;top:50%;transform:rotate(90deg) translateX(-50%);transform-origin:right}
+    .axis.yt{left:50%;top:10px;transform:translateX(-50%)}
+    .axis.yb{left:50%;bottom:10px;transform:translateX(-50%)}
+    .legend{margin-top:12px;border-top:1px solid #22283a;padding-top:10px}
+    .legend-item{display:flex;gap:8px;align-items:center;margin:6px 0;font-size:11px;color:#a0aec0}
+    .dot{width:10px;height:10px;border-radius:50%}
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>SYNAPSE MAP VIEWER</h1>
+      <div class="seed" id="seedLine">Seed: —</div>
+    </div>
+    <div style="font-size:11px;color:#4a5568;text-align:right;line-height:1.4">
+      Axlar: <span style="color:#63b3ed">Intent</span> (vänster→höger) ·
+      <span style="color:#68d391">Perspective</span> (upp→ner)
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div id="stage">
+      <div class="axis yt">SEEKER</div>
+      <div class="axis yb">PROVIDER</div>
+      <div class="axis xl">INFORMATIONAL</div>
+      <div class="axis xr">TRANSACTIONAL</div>
+      <div class="tooltip" id="tooltip"></div>
+      <svg id="svg"></svg>
+    </div>
+
+    <div class="panel">
+      <h2>GraphArtifact JSON</h2>
+      <textarea id="json"></textarea>
+      <button id="render">Render</button>
+      <div class="hint">
+        Tips: klistra in GraphArtifact-output från ditt pipeline-jobb här.  
+        Viewer använder noder/edges/clusters och placerar punkter på (x,y) som kommer från intent×perspective.
+      </div>
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+<script>
+const sample = {"meta": {"version": "1.0.0", "generated_at": "2026-02-05T00:00:00Z", "language": "sv", "market": "SE"}, "seed": {"id": "q.seed", "phrase": "privatlån upp till 800 000", "x": 0.85, "y": 0.85, "intent": "transactional", "perspective": "provider"}, "nodes": [{"id": "q.ansok", "phrase": "ansök privatlån online", "x": 0.88, "y": 0.85, "cluster_id": "A", "intent": "transactional", "perspective": "provider", "confidence": 0.9, "provenance": "ads_api", "size": 11, "flags": []}, {"id": "q.uc", "phrase": "privatlån utan UC", "x": 0.8, "y": 0.78, "cluster_id": "A", "intent": "transactional", "perspective": "provider", "confidence": 0.9, "provenance": "ads_api", "size": 10, "flags": []}, {"id": "q.snabbt", "phrase": "snabbt privatlån 800 000", "x": 0.86, "y": 0.75, "cluster_id": "A", "intent": "transactional", "perspective": "provider", "confidence": 0.9, "provenance": "serp_related", "size": 9, "flags": []}, {"id": "q.utan_sakerhet", "phrase": "låna 800 000 utan säkerhet", "x": 0.9, "y": 0.72, "cluster_id": "A", "intent": "transactional", "perspective": "provider", "confidence": 0.9, "provenance": "ads_api", "size": 9, "flags": []}, {"id": "q.lag_ranta", "phrase": "privatlån låg ränta", "x": 0.82, "y": 0.82, "cluster_id": "A", "intent": "transactional", "perspective": "provider", "confidence": 0.9, "provenance": "ads_api", "size": 10, "flags": []}, {"id": "q.jamfor", "phrase": "jämför privatlån", "x": 0.55, "y": 0.48, "cluster_id": "B", "intent": "commercial", "perspective": "advisor", "confidence": 0.88, "provenance": "ads_api", "size": 12, "flags": []}, {"id": "q.basta", "phrase": "bästa privatlånet 2025", "x": 0.6, "y": 0.52, "cluster_id": "B", "intent": "commercial", "perspective": "advisor", "confidence": 0.9, "provenance": "autocomplete", "size": 11, "flags": []}, {"id": "q.ranta_jamf", "phrase": "privatlån ränta jämförelse", "x": 0.56, "y": 0.56, "cluster_id": "B", "intent": "commercial", "perspective": "advisor", "confidence": 0.86, "provenance": "serp_paa", "size": 9, "flags": []}, {"id": "q.betala_av", "phrase": "betala av privatlån 800 000", "x": 0.68, "y": 0.25, "cluster_id": "C", "intent": "informational", "perspective": "seeker", "confidence": 0.55, "provenance": "serp_paa", "size": 12, "flags": ["⚠ wrong_cluster_for_anchor"]}, {"id": "q.amortera", "phrase": "amortera privatlån snabbare", "x": 0.62, "y": 0.2, "cluster_id": "C", "intent": "howto", "perspective": "seeker", "confidence": 0.5, "provenance": "serp_related", "size": 10, "flags": ["⚠ wrong_cluster_for_anchor"]}, {"id": "q.avbetal", "phrase": "privatlån avbetalningsplan", "x": 0.7, "y": 0.3, "cluster_id": "C", "intent": "informational", "perspective": "seeker", "confidence": 0.6, "provenance": "ads_api", "size": 9, "flags": []}, {"id": "q.hur_mkt", "phrase": "hur mycket kan jag låna", "x": 0.3, "y": 0.28, "cluster_id": "D", "intent": "informational", "perspective": "seeker", "confidence": 0.7, "provenance": "ads_api", "size": 11, "flags": []}, {"id": "q.kvar", "phrase": "kvar att leva på efter lån", "x": 0.22, "y": 0.22, "cluster_id": "D", "intent": "informational", "perspective": "seeker", "confidence": 0.44999999999999996, "provenance": "llm_inferred", "size": 9, "flags": []}, {"id": "q.lagen", "phrase": "konsumentkreditlagen privatlån", "x": 0.24, "y": 0.56, "cluster_id": "E", "intent": "informational", "perspective": "regulator", "confidence": 0.55, "provenance": "serp_top_urls", "size": 9, "flags": []}, {"id": "q.rantetak", "phrase": "räntetak privatlån Sverige", "x": 0.3, "y": 0.62, "cluster_id": "E", "intent": "informational", "perspective": "regulator", "confidence": 0.6, "provenance": "serp_top_urls", "size": 8, "flags": []}], "edges": [{"from": "q.seed", "to": "q.ansok", "strength": 0.92, "types": ["serp_overlap"], "synapse_card": {"from_id": "q.seed", "to_id": "q.ansok", "strength": 0.92, "types": ["serp_overlap"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.9, "bridge_statement": "Direkt relaterat erbjudande/valsteg.", "evidence": [{"source": "serp_top_urls", "kind": "mixed", "summary": "SERP overlap proxy + intent/perspective alignment", "confidence": 0.9}]}}, {"from": "q.seed", "to": "q.uc", "strength": 0.85, "types": ["serp_overlap"], "synapse_card": {"from_id": "q.seed", "to_id": "q.uc", "strength": 0.85, "types": ["serp_overlap"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.85, "bridge_statement": "Direkt relaterat erbjudande/valsteg.", "evidence": [{"source": "serp_top_urls", "kind": "mixed", "summary": "SERP overlap proxy + intent/perspective alignment", "confidence": 0.85}]}}, {"from": "q.seed", "to": "q.snabbt", "strength": 0.88, "types": ["serp_overlap"], "synapse_card": {"from_id": "q.seed", "to_id": "q.snabbt", "strength": 0.88, "types": ["serp_overlap"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.88, "bridge_statement": "Direkt relaterat erbjudande/valsteg.", "evidence": [{"source": "serp_top_urls", "kind": "mixed", "summary": "SERP overlap proxy + intent/perspective alignment", "confidence": 0.88}]}}, {"from": "q.seed", "to": "q.utan_sakerhet", "strength": 0.83, "types": ["serp_overlap"], "synapse_card": {"from_id": "q.seed", "to_id": "q.utan_sakerhet", "strength": 0.83, "types": ["serp_overlap"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.83, "bridge_statement": "Direkt relaterat erbjudande/valsteg.", "evidence": [{"source": "serp_top_urls", "kind": "mixed", "summary": "SERP overlap proxy + intent/perspective alignment", "confidence": 0.83}]}}, {"from": "q.seed", "to": "q.lag_ranta", "strength": 0.86, "types": ["serp_overlap"], "synapse_card": {"from_id": "q.seed", "to_id": "q.lag_ranta", "strength": 0.86, "types": ["serp_overlap"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.86, "bridge_statement": "Direkt relaterat erbjudande/valsteg.", "evidence": [{"source": "serp_top_urls", "kind": "mixed", "summary": "SERP overlap proxy + intent/perspective alignment", "confidence": 0.86}]}}, {"from": "q.seed", "to": "q.jamfor", "strength": 0.78, "types": ["serp_overlap"], "synapse_card": {"from_id": "q.seed", "to_id": "q.jamfor", "strength": 0.78, "types": ["serp_overlap"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.78, "bridge_statement": "Direkt relaterat erbjudande/valsteg.", "evidence": [{"source": "serp_top_urls", "kind": "mixed", "summary": "SERP overlap proxy + intent/perspective alignment", "confidence": 0.78}]}}, {"from": "q.seed", "to": "q.basta", "strength": 0.8, "types": ["serp_overlap"], "synapse_card": {"from_id": "q.seed", "to_id": "q.basta", "strength": 0.8, "types": ["serp_overlap"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.8, "bridge_statement": "Direkt relaterat erbjudande/valsteg.", "evidence": [{"source": "serp_top_urls", "kind": "mixed", "summary": "SERP overlap proxy + intent/perspective alignment", "confidence": 0.8}]}}, {"from": "q.seed", "to": "q.ranta_jamf", "strength": 0.76, "types": ["serp_overlap"], "synapse_card": {"from_id": "q.seed", "to_id": "q.ranta_jamf", "strength": 0.76, "types": ["serp_overlap"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.76, "bridge_statement": "Direkt relaterat erbjudande/valsteg.", "evidence": [{"source": "serp_top_urls", "kind": "mixed", "summary": "SERP overlap proxy + intent/perspective alignment", "confidence": 0.76}]}}, {"from": "q.seed", "to": "q.betala_av", "strength": 0.45, "types": ["perspective_shift", "facet_transform"], "synapse_card": {"from_id": "q.seed", "to_id": "q.betala_av", "strength": 0.45, "types": ["perspective_shift", "facet_transform"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.45, "bridge_statement": "Delar privatlån/800 000 men handlar om återbetalning (annan användarresa).", "evidence": [{"source": "serp_top_urls", "kind": "mixed", "summary": "Low SERP overlap proxy; perspective mismatch", "confidence": 0.45}]}}, {"from": "q.seed", "to": "q.amortera", "strength": 0.4, "types": ["perspective_shift", "facet_transform"], "synapse_card": {"from_id": "q.seed", "to_id": "q.amortera", "strength": 0.4, "types": ["perspective_shift", "facet_transform"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.4, "bridge_statement": "Delar privatlån/800 000 men handlar om återbetalning (annan användarresa).", "evidence": [{"source": "serp_top_urls", "kind": "mixed", "summary": "Low SERP overlap proxy; perspective mismatch", "confidence": 0.4}]}}, {"from": "q.seed", "to": "q.avbetal", "strength": 0.5, "types": ["perspective_shift", "facet_transform"], "synapse_card": {"from_id": "q.seed", "to_id": "q.avbetal", "strength": 0.5, "types": ["perspective_shift", "facet_transform"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.5, "bridge_statement": "Delar privatlån/800 000 men handlar om återbetalning (annan användarresa).", "evidence": [{"source": "serp_top_urls", "kind": "mixed", "summary": "Low SERP overlap proxy; perspective mismatch", "confidence": 0.5}]}}, {"from": "q.seed", "to": "q.hur_mkt", "strength": 0.6, "types": ["serp_overlap"], "synapse_card": {"from_id": "q.seed", "to_id": "q.hur_mkt", "strength": 0.6, "types": ["serp_overlap"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.6, "bridge_statement": "Direkt relaterat erbjudande/valsteg.", "evidence": [{"source": "serp_top_urls", "kind": "mixed", "summary": "SERP overlap proxy + intent/perspective alignment", "confidence": 0.6}]}}, {"from": "q.seed", "to": "q.kvar", "strength": 0.35, "types": ["perspective_shift", "facet_transform"], "synapse_card": {"from_id": "q.seed", "to_id": "q.kvar", "strength": 0.35, "types": ["perspective_shift", "facet_transform"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.35, "bridge_statement": "Delar privatlån/800 000 men handlar om återbetalning (annan användarresa).", "evidence": [{"source": "serp_top_urls", "kind": "mixed", "summary": "Low SERP overlap proxy; perspective mismatch", "confidence": 0.35}]}}, {"from": "q.seed", "to": "q.lagen", "strength": 0.45, "types": ["perspective_shift", "facet_transform"], "synapse_card": {"from_id": "q.seed", "to_id": "q.lagen", "strength": 0.45, "types": ["perspective_shift", "facet_transform"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.45, "bridge_statement": "Delar privatlån/800 000 men handlar om återbetalning (annan användarresa).", "evidence": [{"source": "serp_top_urls", "kind": "mixed", "summary": "Low SERP overlap proxy; perspective mismatch", "confidence": 0.45}]}}, {"from": "q.seed", "to": "q.rantetak", "strength": 0.5, "types": ["perspective_shift", "facet_transform"], "synapse_card": {"from_id": "q.seed", "to_id": "q.rantetak", "strength": 0.5, "types": ["perspective_shift", "facet_transform"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.5, "bridge_statement": "Delar privatlån/800 000 men handlar om återbetalning (annan användarresa).", "evidence": [{"source": "serp_top_urls", "kind": "mixed", "summary": "Low SERP overlap proxy; perspective mismatch", "confidence": 0.5}]}}, {"from": "q.jamfor", "to": "q.basta", "strength": 0.72, "types": ["facet_transform"], "synapse_card": {"from_id": "q.jamfor", "to_id": "q.basta", "strength": 0.72, "types": ["facet_transform"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.72, "bridge_statement": "Samma jämför-intent, superlativ-variant.", "evidence": [{"source": "serp_top_urls", "kind": "intra", "summary": "cluster cohesion signals", "confidence": 0.72}]}}, {"from": "q.betala_av", "to": "q.amortera", "strength": 0.8, "types": ["task_chain"], "synapse_card": {"from_id": "q.betala_av", "to_id": "q.amortera", "strength": 0.8, "types": ["task_chain"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.8, "bridge_statement": "Amortera är ett sätt att betala av snabbare.", "evidence": [{"source": "serp_top_urls", "kind": "intra", "summary": "cluster cohesion signals", "confidence": 0.8}]}}, {"from": "q.lagen", "to": "q.rantetak", "strength": 0.7, "types": ["shared_entity"], "synapse_card": {"from_id": "q.lagen", "to_id": "q.rantetak", "strength": 0.7, "types": ["shared_entity"], "direction": "bidirectional", "intent_shift": "", "perspective_shift": "", "confidence": 0.7, "bridge_statement": "Regelverk kring ränta hör ihop.", "evidence": [{"source": "serp_top_urls", "kind": "intra", "summary": "cluster cohesion signals", "confidence": 0.7}]}}], "clusters": [{"id": "A", "label": "A: Ansöka om lån", "color": "#e53e3e", "dominant_intent": "transactional", "dominant_perspective": "provider", "centroid": {"x": 0.78, "y": 0.8}, "node_ids": ["q.ansok", "q.uc", "q.snabbt", "q.utan_sakerhet", "q.lag_ranta"], "hub_entities": ["privatlån"]}, {"id": "B", "label": "B: Jämföra lån", "color": "#ed8936", "dominant_intent": "commercial", "dominant_perspective": "advisor", "centroid": {"x": 0.58, "y": 0.5}, "node_ids": ["q.jamfor", "q.basta", "q.ranta_jamf"], "hub_entities": ["privatlån"]}, {"id": "C", "label": "C: Hantera befintligt", "color": "#4299e1", "dominant_intent": "informational", "dominant_perspective": "seeker", "centroid": {"x": 0.7, "y": 0.25}, "node_ids": ["q.betala_av", "q.amortera", "q.avbetal"], "hub_entities": ["privatlån"]}, {"id": "D", "label": "D: Ekonomisk planering", "color": "#68d391", "dominant_intent": "informational", "dominant_perspective": "seeker", "centroid": {"x": 0.28, "y": 0.25}, "node_ids": ["q.hur_mkt", "q.kvar"], "hub_entities": ["privatlån"]}, {"id": "E", "label": "E: Regelverk", "color": "#9f7aea", "dominant_intent": "informational", "dominant_perspective": "regulator", "centroid": {"x": 0.25, "y": 0.6}, "node_ids": ["q.lagen", "q.rantetak"], "hub_entities": ["privatlån"]}], "legend": {"intent_axis": "informational -> transactional", "perspective_axis": "seeker -> provider", "strength_buckets": [{"min": 0.0, "max": 0.49, "label": "weak"}, {"min": 0.5, "max": 0.69, "label": "medium"}, {"min": 0.7, "max": 1.0, "label": "strong"}]}, "warnings": []};
+
+const svg = document.getElementById('svg');
+const tooltip = document.getElementById('tooltip');
+const textarea = document.getElementById('json');
+const seedLine = document.getElementById('seedLine');
+const legendEl = document.getElementById('legend');
+
+function clearSvg(){ while(svg.firstChild) svg.removeChild(svg.firstChild); }
+
+function el(name){ return document.createElementNS('http://www.w3.org/2000/svg', name); }
+
+function toX(x){ const W = window.innerWidth - 340; return 40 + x * (W - 80); }
+function toY(y){ const H = window.innerHeight - 52; return 40 + y * (H - 80); }
+
+function strengthColor(s){
+  if (s >= 0.70) return '#68d391';
+  if (s >= 0.50) return '#ecc94b';
+  return '#fc8181';
+}
+
+function renderLegend(graph){
+  legendEl.innerHTML = '<h2 style="margin:0 0 8px;font-size:12px;color:#a0aec0;text-transform:uppercase;letter-spacing:1px">Kluster</h2>';
+  graph.clusters.forEach(c=>{
+    const row = document.createElement('div');
+    row.className='legend-item';
+    row.innerHTML = `<span class="dot" style="background:${c.color}"></span>
+      <span>${c.label}</span>`;
+    legendEl.appendChild(row);
+  });
+}
+
+function showTooltip(evt, node, synapse){
+  const rect = svg.getBoundingClientRect();
+  const x = evt.clientX - rect.left;
+  const y = evt.clientY - rect.top;
+
+  const s = synapse?.strength ?? node.confidence ?? 0;
+  const col = strengthColor(s);
+  const card = synapse?.synapse_card;
+
+  tooltip.innerHTML = `
+    <div class="t-title">${node.phrase}</div>
+    <div class="t-meta">
+      <span class="tag">${node.intent}</span>
+      <span class="tag">${node.perspective}</span>
+      <span class="tag" style="color:${col}">strength ${s.toFixed(2)}</span>
+      <span class="tag">${node.provenance}</span>
+    </div>
+    <div class="t-card">${card ? card.bridge_statement : '—'}</div>
+  `;
+  let tx = x + 14, ty = y + 10;
+  const maxW = 340, maxH = 180;
+  if (tx + maxW > rect.width) tx = x - maxW - 14;
+  if (ty + maxH > rect.height) ty = rect.height - maxH - 12;
+  tooltip.style.left = tx + 'px';
+  tooltip.style.top = ty + 'px';
+  tooltip.classList.add('visible');
+}
+
+function hideTooltip(){ tooltip.classList.remove('visible'); }
+
+function renderGraph(graph){
+  clearSvg();
+  seedLine.textContent = `Seed: "${graph.seed.phrase}"`;
+
+  // cluster zones
+  graph.clusters.forEach(c=>{
+    const e = el('ellipse');
+    e.setAttribute('cx', toX(c.centroid.x));
+    e.setAttribute('cy', toY(c.centroid.y));
+    e.setAttribute('rx', 130);
+    e.setAttribute('ry', 95);
+    e.setAttribute('fill', c.color);
+    e.setAttribute('opacity', 0.08);
+    svg.appendChild(e);
+
+    const t = el('text');
+    t.setAttribute('x', toX(c.centroid.x));
+    t.setAttribute('y', toY(c.centroid.y) - 100);
+    t.setAttribute('text-anchor','middle');
+    t.setAttribute('fill', c.color);
+    t.setAttribute('opacity', 0.7);
+    t.setAttribute('font-size','11px');
+    t.setAttribute('font-weight','700');
+    t.textContent = c.label;
+    svg.appendChild(t);
+  });
+
+  // edges
+  graph.edges.forEach(ed=>{
+    if (ed.strength < 0.40) return;
+    const a = graph.nodes.find(n=>n.id===ed.from) || (graph.seed.id===ed.from? graph.seed : null);
+    const b = graph.nodes.find(n=>n.id===ed.to) || (graph.seed.id===ed.to? graph.seed : null);
+    if (!a||!b) return;
+
+    const l = el('line');
+    l.setAttribute('x1', toX(a.x)); l.setAttribute('y1', toY(a.y));
+    l.setAttribute('x2', toX(b.x)); l.setAttribute('y2', toY(b.y));
+    l.setAttribute('stroke', strengthColor(ed.strength));
+    l.setAttribute('stroke-width', Math.max(1, ed.strength*3));
+    l.setAttribute('opacity', 0.18);
+    svg.appendChild(l);
+  });
+
+  // seed node
+  const sg = el('g');
+  const pulse = el('circle');
+  pulse.setAttribute('cx', toX(graph.seed.x));
+  pulse.setAttribute('cy', toY(graph.seed.y));
+  pulse.setAttribute('r', 20);
+  pulse.setAttribute('fill', 'none');
+  pulse.setAttribute('stroke', '#fff');
+  pulse.setAttribute('stroke-width', '2');
+  pulse.setAttribute('opacity', '0.35');
+  sg.appendChild(pulse);
+
+  const sc = el('circle');
+  sc.setAttribute('cx', toX(graph.seed.x));
+  sc.setAttribute('cy', toY(graph.seed.y));
+  sc.setAttribute('r', 14);
+  sc.setAttribute('fill', '#e53e3e');
+  sc.setAttribute('opacity', '0.9');
+  sc.setAttribute('stroke', '#fff');
+  sc.setAttribute('stroke-width','2');
+  sg.appendChild(sc);
+
+  const st = el('text');
+  st.setAttribute('x', toX(graph.seed.x));
+  st.setAttribute('y', toY(graph.seed.y)+5);
+  st.setAttribute('text-anchor','middle');
+  st.setAttribute('fill','#fff');
+  st.setAttribute('font-size','14px');
+  st.textContent='★';
+  sg.appendChild(st);
+
+  svg.appendChild(sg);
+
+  // nodes
+  const byId = new Map(graph.nodes.map(n=>[n.id,n]));
+  graph.nodes.forEach(n=>{
+    const g = el('g');
+
+    const c = graph.clusters.find(x=>x.id===n.cluster_id);
+    const fill = c ? c.color : '#4299e1';
+    const r = Math.max(6, n.size);
+
+    const circle = el('circle');
+    circle.setAttribute('cx', toX(n.x));
+    circle.setAttribute('cy', toY(n.y));
+    circle.setAttribute('r', r);
+    circle.setAttribute('fill', fill);
+    circle.setAttribute('opacity', Math.max(0.3, n.confidence));
+    circle.setAttribute('stroke', '#0f1117');
+    circle.setAttribute('stroke-width', '1');
+    g.appendChild(circle);
+
+    const label = el('text');
+    label.setAttribute('x', toX(n.x));
+    label.setAttribute('y', toY(n.y)+r+14);
+    label.setAttribute('text-anchor','middle');
+    label.setAttribute('fill','#a0aec0');
+    label.setAttribute('font-size','10px');
+    label.textContent = n.phrase.length>28 ? (n.phrase.slice(0,26)+'…') : n.phrase;
+    g.appendChild(label);
+
+    // find synapse edge to seed if exists
+    const syn = graph.edges.find(ed => (ed.from===graph.seed.id && ed.to===n.id) || (ed.to===graph.seed.id && ed.from===n.id));
+
+    g.addEventListener('mouseenter', (evt)=>showTooltip(evt,n,syn));
+    g.addEventListener('mouseleave', hideTooltip);
+
+    svg.appendChild(g);
+  });
+
+  renderLegend(graph);
+}
+
+function safeParse(txt){
+  try { return JSON.parse(txt); } catch(e){ return null; }
+}
+
+textarea.value = JSON.stringify(sample, null, 2);
+document.getElementById('render').addEventListener('click', ()=>{
+  const g = safeParse(textarea.value);
+  if(!g){ alert('Invalid JSON'); return; }
+  renderGraph(g);
+});
+
+window.addEventListener('resize', ()=>{
+  const g = safeParse(textarea.value);
+  if(g) renderGraph(g);
+});
+
+// initial
+renderGraph(sample);
+</script>
+</body>
+</html>

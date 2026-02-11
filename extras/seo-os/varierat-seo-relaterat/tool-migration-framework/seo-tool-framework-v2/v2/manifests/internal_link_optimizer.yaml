@@ -1,0 +1,105 @@
+# Internal Link Optimizer Tool Manifest
+
+tool:
+  id: internal_link_optimizer
+  name: "Internal Link Optimizer"
+  description: "Optimize internal linking structure by suggesting strategic links. Identifies orphan pages and recommends relevant internal link opportunities."
+  
+  category: links
+  archetype: optimizer
+  icon: "⚡"
+  color: "#8B5CF6"
+  
+  backend:
+    module: "tools.test_tools.internal_link_optimizer"
+    class: "InternalLinkOptimizerService"
+    config_class: "InternalLinkOptimizerServiceConfig"
+    result_class: "InternalLinkOptimizerServiceResult"
+    method: "optimize"
+  
+  inputs:
+    - name: site_url
+      label: "Site URL"
+      type: text
+      required: true
+      placeholder: "https://example.com"
+      description: "The website to analyze for internal linking opportunities"
+    
+    - name: max_suggestions
+      label: "Maximum Suggestions"
+      type: number
+      default: 50
+      min: 10
+      max: 200
+      description: "Maximum number of link suggestions to generate"
+    
+    - name: min_relevance_score
+      label: "Minimum Relevance Score"
+      type: number
+      default: 0.6
+      min: 0.1
+      max: 1.0
+      description: "Only suggest links above this relevance threshold (0.1-1.0)"
+  
+  outputs:
+    type: mixed
+    sections:
+      - name: summary
+        type: stats
+        fields:
+          - total_suggestions
+          - total_orphan_pages
+          - pages_analyzed
+          - estimated_impact
+      
+      - name: suggestions
+        type: table
+        columns:
+          - name: source_url
+            label: "From Page"
+            truncate: true
+          - name: target_url
+            label: "To Page"
+            truncate: true
+          - name: suggested_anchor
+            label: "Anchor Text"
+          - name: relevance_score
+            label: "Relevance"
+            type: number
+          - name: impact_score
+            label: "Impact"
+            type: number
+            highlight: true
+          - name: reason
+            label: "Reason"
+      
+      - name: orphan_pages
+        type: table
+        title: "Orphan Pages (No Internal Links)"
+        columns:
+          - name: url
+            label: "Page URL"
+          - name: title
+            label: "Page Title"
+          - name: suggested_sources
+            label: "Suggested Link Sources"
+            type: array
+  
+  actions:
+    - id: implement_links
+      label: "Generate Implementation Plan"
+      icon: "📋"
+      type: export
+      format: csv
+    
+    - id: prioritize
+      label: "Sort by Impact"
+      icon: "⬆️"
+      type: sort
+      field: impact_score
+    
+    - id: fix_orphans
+      label: "Fix Orphan Pages First"
+      icon: "🔗"
+      type: filter
+      show: orphan_pages

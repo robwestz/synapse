@@ -1,0 +1,101 @@
+# SERP Volatility Monitor Tool Manifest
+
+tool:
+  id: serp_volatility
+  name: "SERP Volatility Monitor"
+  description: "Monitor SERP volatility and detect potential algorithm updates. Tracks ranking fluctuations across categories to identify Google updates early."
+  
+  category: serp
+  archetype: monitor
+  icon: "📊"
+  color: "#F59E0B"
+  
+  backend:
+    module: "tools.test_tools.serp_volatility"
+    class: "SerpVolatilityService"
+    config_class: "SerpVolatilityServiceConfig"
+    result_class: "SerpVolatilityServiceResult"
+    method: "monitor"
+  
+  inputs:
+    - name: categories
+      label: "Categories to Monitor"
+      type: select
+      multiple: true
+      default: ["all"]
+      options:
+        - value: all
+          label: "All Categories"
+        - value: technology
+          label: "Technology"
+        - value: health
+          label: "Health & Medical"
+        - value: finance
+          label: "Finance"
+        - value: ecommerce
+          label: "E-commerce"
+        - value: local
+          label: "Local"
+        - value: news
+          label: "News"
+      description: "Select which verticals to monitor for volatility"
+    
+    - name: lookback_days
+      label: "Lookback Period (Days)"
+      type: number
+      default: 30
+      min: 7
+      max: 90
+      description: "Number of days of historical data to analyze"
+  
+  outputs:
+    type: mixed
+    sections:
+      - name: summary
+        type: stats
+        fields:
+          - current_volatility
+          - trend
+          - alert_triggered
+      
+      - name: volatility_history
+        type: chart
+        chart_type: line
+        x_axis: date
+        y_axis: volatility_score
+      
+      - name: detected_updates
+        type: table
+        columns:
+          - name: date
+            label: "Date"
+          - name: confidence
+            label: "Confidence"
+            type: number
+          - name: severity
+            label: "Severity"
+          - name: affected_categories
+            label: "Categories"
+            type: array
+          - name: description
+            label: "Description"
+      
+      - name: category_breakdown
+        type: key_value
+  
+  actions:
+    - id: set_alert
+      label: "Set Alert Threshold"
+      icon: "🔔"
+      type: config
+    
+    - id: export
+      label: "Export Report"
+      icon: "📊"
+      type: export
+      format: pdf
+    
+    - id: compare_dates
+      label: "Compare Specific Dates"
+      icon: "📅"
+      type: modal

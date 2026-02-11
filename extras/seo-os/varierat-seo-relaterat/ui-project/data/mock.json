@@ -1,0 +1,159 @@
+{
+  "system": {
+    "status": "healthy",
+    "uptime": "4d 6h",
+    "version": "0.8.1",
+    "api_url": "http://localhost:8000",
+    "mode": "pilot"
+  },
+  "metrics": {
+    "models_loaded": 7,
+    "total_extractions": 48210,
+    "avg_processing_time": "1.8s",
+    "errors": 3,
+    "cache_size": "1.4GB",
+    "request_rate": "42/min",
+    "requests_today": 12840,
+    "avg_latency_ms": 84,
+    "queue_depth": 17,
+    "active_connectors": 6,
+    "pipelines_running": 3
+  },
+  "capabilities": [
+    "routing",
+    "entities",
+    "concepts",
+    "multilingual",
+    "streaming",
+    "batch",
+    "governance"
+  ],
+  "models": [
+    {"name": "Atlas-7B", "type": "semantic", "status": "ok", "version": "v2.1", "size": "7B"},
+    {"name": "Delta-2", "type": "multilingual", "status": "warming", "version": "v1.4", "size": "2B"},
+    {"name": "VectorGuard", "type": "safety", "status": "ok", "version": "v3.0", "size": "6B"},
+    {"name": "SignalNet", "type": "stream", "status": "ok", "version": "v1.9", "size": "1.3B"}
+  ],
+  "endpoints": [
+    {"method": "POST", "path": "/v1/extract", "status": "ok", "latency": "84ms"},
+    {"method": "POST", "path": "/v1/batch", "status": "queued", "latency": "220ms"},
+    {"method": "GET", "path": "/v1/health", "status": "ok", "latency": "24ms"},
+    {"method": "POST", "path": "/v1/stream", "status": "warming", "latency": "140ms"}
+  ],
+  "connections": [
+    {"name": "SEO Tool", "type": "python_module", "status": "linked", "latency_ms": 84},
+    {"name": "CMS Sync", "type": "api", "status": "linked", "latency_ms": 126},
+    {"name": "Keyword Lab", "type": "internal", "status": "warming", "latency_ms": 210},
+    {"name": "Vector DB", "type": "storage", "status": "linked", "latency_ms": 32},
+    {"name": "Analytics", "type": "external", "status": "queued", "latency_ms": 0},
+    {"name": "Audit Bot", "type": "agent", "status": "linked", "latency_ms": 64}
+  ],
+  "pipelines": [
+    {"name": "Content Enrichment", "mode": "api", "state": "running", "throughput": "2.1k docs/day"},
+    {"name": "Site Crawl", "mode": "batch", "state": "paused", "throughput": "0.9k urls/day"},
+    {"name": "Brand Index", "mode": "module", "state": "running", "throughput": "620 docs/day"}
+  ],
+  "runs": [
+    {"id": "run_4021", "status": "ok", "duration": "4m 12s", "summary": "12 docs processed"},
+    {"id": "run_4020", "status": "warn", "duration": "5m 03s", "summary": "cache miss spike"},
+    {"id": "run_4019", "status": "ok", "duration": "3m 58s", "summary": "9 docs processed"}
+  ],
+  "activity": [
+    {"time": "2m ago", "text": "SEO Tool requested semantic ranker", "status": "linked"},
+    {"time": "12m ago", "text": "CMS Sync pushed 142 documents", "status": "ok"},
+    {"time": "34m ago", "text": "New connector approved: Audit Bot", "status": "ok"},
+    {"time": "1h ago", "text": "Pipeline Site Crawl paused (quota)", "status": "paused"}
+  ],
+  "languages": ["en", "sv", "de", "fr", "es", "pt"],
+  "samples": [
+    {
+      "title": "Release note",
+      "text": "SIE-X 0.9 adds streaming extraction and multilingual keyword tagging for European markets."
+    },
+    {
+      "title": "Customer brief",
+      "text": "Acme Retail wants daily product feeds, entity linking, and compliance flags for regulated markets."
+    },
+    {
+      "title": "Incident summary",
+      "text": "Cache latency spiked after Atlas-7B reload; batch queue depth doubled in 12 minutes."
+    }
+  ],
+  "flight_actions": [
+    {
+      "name": "Warm models",
+      "tag": "core",
+      "status": "ok",
+      "description": "Prime Atlas + VectorGuard to reduce cold starts.",
+      "eta": "3-5 min",
+      "owner": "siex-core"
+    },
+    {
+      "name": "Sync knowledge vault",
+      "tag": "kb",
+      "status": "running",
+      "description": "Pull latest Claude + Maps indexes for fusion.",
+      "eta": "8 min",
+      "owner": "siex-kb"
+    },
+    {
+      "name": "Flush cache",
+      "tag": "ops",
+      "status": "queued",
+      "description": "Clear stale embeddings and refresh route cache.",
+      "eta": "1 min",
+      "owner": "siex-ops"
+    },
+    {
+      "name": "Run smoke checks",
+      "tag": "qa",
+      "status": "paused",
+      "description": "Validate API health and tool surfaces.",
+      "eta": "6 min",
+      "owner": "siex-qa"
+    }
+  ],
+  "alerts": [
+    {
+      "title": "Queue pressure",
+      "tone": "warn",
+      "summary": "Batch queue above target, consider a warmup run.",
+      "eta": "15m",
+      "impact": "medium"
+    },
+    {
+      "title": "Cache warmed",
+      "tone": "ok",
+      "summary": "Atlas-7B vectors refreshed, latency stabilized.",
+      "eta": "now",
+      "impact": "low"
+    },
+    {
+      "title": "Connector drift",
+      "tone": "warn",
+      "summary": "CMS Sync latency trending above 150ms.",
+      "eta": "30m",
+      "impact": "medium"
+    }
+  ],
+  "focus": [
+    {
+      "title": "Re-index Claude vault",
+      "owner": "kb",
+      "eta": "today",
+      "status": "active"
+    },
+    {
+      "title": "Route planner sync",
+      "owner": "geo",
+      "eta": "2h",
+      "status": "planned"
+    },
+    {
+      "title": "SIE-X API hardening",
+      "owner": "core",
+      "eta": "tomorrow",
+      "status": "planned"
+    }
+  ]
+}

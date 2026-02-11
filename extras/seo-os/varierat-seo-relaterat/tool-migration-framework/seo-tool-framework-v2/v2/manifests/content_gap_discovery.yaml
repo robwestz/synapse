@@ -1,0 +1,106 @@
+# Content Gap Discovery Tool Manifest
+
+tool:
+  id: content_gap_discovery
+  name: "Content Gap Discovery"
+  description: "Discover content opportunities by analyzing what competitors rank for that you don't. Identifies high-opportunity keywords to target."
+  
+  category: content
+  archetype: discoverer
+  icon: "🎯"
+  color: "#EF4444"
+  
+  backend:
+    module: "tools.test_tools.content_gap_discovery"
+    class: "ContentGapDiscoveryService"
+    config_class: "ContentGapDiscoveryServiceConfig"
+    result_class: "ContentGapDiscoveryServiceResult"
+    method: "generate"
+  
+  inputs:
+    - name: domain
+      label: "Your Domain"
+      type: text
+      required: true
+      placeholder: "example.com"
+      description: "The domain you want to find content gaps for"
+    
+    - name: competitors
+      label: "Competitor Domains"
+      type: url_list
+      required: false
+      placeholder: |
+        competitor1.com
+        competitor2.com
+        competitor3.com
+      description: "Competitor domains to analyze (one per line). Leave empty for auto-detection."
+    
+    - name: min_search_volume
+      label: "Minimum Search Volume"
+      type: number
+      default: 100
+      min: 0
+      max: 100000
+      description: "Only show keywords with at least this monthly search volume"
+    
+    - name: max_difficulty
+      label: "Maximum Keyword Difficulty"
+      type: number
+      default: 70
+      min: 0
+      max: 100
+      description: "Filter out keywords harder than this (0-100 scale)"
+  
+  outputs:
+    type: table
+    primary_field: gaps
+    columns:
+      - name: keyword
+        label: "Keyword"
+        sortable: true
+      - name: search_volume
+        label: "Volume"
+        type: number
+        sortable: true
+      - name: difficulty
+        label: "KD"
+        type: number
+        sortable: true
+      - name: opportunity_score
+        label: "Opportunity"
+        type: number
+        sortable: true
+        highlight: true
+      - name: competitor_count
+        label: "Competitors"
+        type: number
+      - name: suggested_content_type
+        label: "Content Type"
+      - name: intent
+        label: "Intent"
+      - name: estimated_traffic
+        label: "Est. Traffic"
+        type: number
+  
+  actions:
+    - id: generate_brief
+      label: "Generate Content Brief"
+      icon: "📝"
+      target_tool: rag_content_brief
+      pass_fields:
+        - keyword
+        - search_volume
+        - intent
+    
+    - id: export_csv
+      label: "Export to CSV"
+      icon: "📊"
+      type: export
+      format: csv
+    
+    - id: cluster_keywords
+      label: "Cluster These Keywords"
+      icon: "🔍"
+      target_tool: keyword_clustering
+      pass_fields:
+        - keyword

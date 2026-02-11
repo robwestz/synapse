@@ -1,0 +1,9 @@
+{
+  "id": "brief_gen",
+  "name": "Brief Generator",
+  "version": "1.0.0",
+  "description": "Automatically generates SEO briefs based on SERP data.",
+  "category": "Content",
+  "icon": "📝",
+  "entry_point": "ui.py"
+}

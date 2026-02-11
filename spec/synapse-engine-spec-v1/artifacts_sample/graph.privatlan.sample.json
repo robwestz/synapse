@@ -1,0 +1,872 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "generated_at": "2026-02-05T00:00:00Z",
+    "language": "sv",
+    "market": "SE"
+  },
+  "seed": {
+    "id": "q.seed",
+    "phrase": "privatlån upp till 800 000",
+    "x": 0.85,
+    "y": 0.85,
+    "intent": "transactional",
+    "perspective": "provider"
+  },
+  "nodes": [
+    {
+      "id": "q.ansok",
+      "phrase": "ansök privatlån online",
+      "x": 0.88,
+      "y": 0.85,
+      "cluster_id": "A",
+      "intent": "transactional",
+      "perspective": "provider",
+      "confidence": 0.9,
+      "provenance": "ads_api",
+      "size": 11,
+      "flags": []
+    },
+    {
+      "id": "q.uc",
+      "phrase": "privatlån utan UC",
+      "x": 0.8,
+      "y": 0.78,
+      "cluster_id": "A",
+      "intent": "transactional",
+      "perspective": "provider",
+      "confidence": 0.9,
+      "provenance": "ads_api",
+      "size": 10,
+      "flags": []
+    },
+    {
+      "id": "q.snabbt",
+      "phrase": "snabbt privatlån 800 000",
+      "x": 0.86,
+      "y": 0.75,
+      "cluster_id": "A",
+      "intent": "transactional",
+      "perspective": "provider",
+      "confidence": 0.9,
+      "provenance": "serp_related",
+      "size": 9,
+      "flags": []
+    },
+    {
+      "id": "q.utan_sakerhet",
+      "phrase": "låna 800 000 utan säkerhet",
+      "x": 0.9,
+      "y": 0.72,
+      "cluster_id": "A",
+      "intent": "transactional",
+      "perspective": "provider",
+      "confidence": 0.9,
+      "provenance": "ads_api",
+      "size": 9,
+      "flags": []
+    },
+    {
+      "id": "q.lag_ranta",
+      "phrase": "privatlån låg ränta",
+      "x": 0.82,
+      "y": 0.82,
+      "cluster_id": "A",
+      "intent": "transactional",
+      "perspective": "provider",
+      "confidence": 0.9,
+      "provenance": "ads_api",
+      "size": 10,
+      "flags": []
+    },
+    {
+      "id": "q.jamfor",
+      "phrase": "jämför privatlån",
+      "x": 0.55,
+      "y": 0.48,
+      "cluster_id": "B",
+      "intent": "commercial",
+      "perspective": "advisor",
+      "confidence": 0.88,
+      "provenance": "ads_api",
+      "size": 12,
+      "flags": []
+    },
+    {
+      "id": "q.basta",
+      "phrase": "bästa privatlånet 2025",
+      "x": 0.6,
+      "y": 0.52,
+      "cluster_id": "B",
+      "intent": "commercial",
+      "perspective": "advisor",
+      "confidence": 0.9,
+      "provenance": "autocomplete",
+      "size": 11,
+      "flags": []
+    },
+    {
+      "id": "q.ranta_jamf",
+      "phrase": "privatlån ränta jämförelse",
+      "x": 0.56,
+      "y": 0.56,
+      "cluster_id": "B",
+      "intent": "commercial",
+      "perspective": "advisor",
+      "confidence": 0.86,
+      "provenance": "serp_paa",
+      "size": 9,
+      "flags": []
+    },
+    {
+      "id": "q.betala_av",
+      "phrase": "betala av privatlån 800 000",
+      "x": 0.68,
+      "y": 0.25,
+      "cluster_id": "C",
+      "intent": "informational",
+      "perspective": "seeker",
+      "confidence": 0.55,
+      "provenance": "serp_paa",
+      "size": 12,
+      "flags": [
+        "⚠ wrong_cluster_for_anchor"
+      ]
+    },
+    {
+      "id": "q.amortera",
+      "phrase": "amortera privatlån snabbare",
+      "x": 0.62,
+      "y": 0.2,
+      "cluster_id": "C",
+      "intent": "howto",
+      "perspective": "seeker",
+      "confidence": 0.5,
+      "provenance": "serp_related",
+      "size": 10,
+      "flags": [
+        "⚠ wrong_cluster_for_anchor"
+      ]
+    },
+    {
+      "id": "q.avbetal",
+      "phrase": "privatlån avbetalningsplan",
+      "x": 0.7,
+      "y": 0.3,
+      "cluster_id": "C",
+      "intent": "informational",
+      "perspective": "seeker",
+      "confidence": 0.6,
+      "provenance": "ads_api",
+      "size": 9,
+      "flags": []
+    },
+    {
+      "id": "q.hur_mkt",
+      "phrase": "hur mycket kan jag låna",
+      "x": 0.3,
+      "y": 0.28,
+      "cluster_id": "D",
+      "intent": "informational",
+      "perspective": "seeker",
+      "confidence": 0.7,
+      "provenance": "ads_api",
+      "size": 11,
+      "flags": []
+    },
+    {
+      "id": "q.kvar",
+      "phrase": "kvar att leva på efter lån",
+      "x": 0.22,
+      "y": 0.22,
+      "cluster_id": "D",
+      "intent": "informational",
+      "perspective": "seeker",
+      "confidence": 0.44999999999999996,
+      "provenance": "llm_inferred",
+      "size": 9,
+      "flags": []
+    },
+    {
+      "id": "q.lagen",
+      "phrase": "konsumentkreditlagen privatlån",
+      "x": 0.24,
+      "y": 0.56,
+      "cluster_id": "E",
+      "intent": "informational",
+      "perspective": "regulator",
+      "confidence": 0.55,
+      "provenance": "serp_top_urls",
+      "size": 9,
+      "flags": []
+    },
+    {
+      "id": "q.rantetak",
+      "phrase": "räntetak privatlån Sverige",
+      "x": 0.3,
+      "y": 0.62,
+      "cluster_id": "E",
+      "intent": "informational",
+      "perspective": "regulator",
+      "confidence": 0.6,
+      "provenance": "serp_top_urls",
+      "size": 8,
+      "flags": []
+    }
+  ],
+  "edges": [
+    {
+      "from": "q.seed",
+      "to": "q.ansok",
+      "strength": 0.92,
+      "types": [
+        "serp_overlap"
+      ],
+      "synapse_card": {
+        "from_id": "q.seed",
+        "to_id": "q.ansok",
+        "strength": 0.92,
+        "types": [
+          "serp_overlap"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.9,
+        "bridge_statement": "Direkt relaterat erbjudande/valsteg.",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "mixed",
+            "summary": "SERP overlap proxy + intent/perspective alignment",
+            "confidence": 0.9
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.seed",
+      "to": "q.uc",
+      "strength": 0.85,
+      "types": [
+        "serp_overlap"
+      ],
+      "synapse_card": {
+        "from_id": "q.seed",
+        "to_id": "q.uc",
+        "strength": 0.85,
+        "types": [
+          "serp_overlap"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.85,
+        "bridge_statement": "Direkt relaterat erbjudande/valsteg.",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "mixed",
+            "summary": "SERP overlap proxy + intent/perspective alignment",
+            "confidence": 0.85
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.seed",
+      "to": "q.snabbt",
+      "strength": 0.88,
+      "types": [
+        "serp_overlap"
+      ],
+      "synapse_card": {
+        "from_id": "q.seed",
+        "to_id": "q.snabbt",
+        "strength": 0.88,
+        "types": [
+          "serp_overlap"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.88,
+        "bridge_statement": "Direkt relaterat erbjudande/valsteg.",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "mixed",
+            "summary": "SERP overlap proxy + intent/perspective alignment",
+            "confidence": 0.88
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.seed",
+      "to": "q.utan_sakerhet",
+      "strength": 0.83,
+      "types": [
+        "serp_overlap"
+      ],
+      "synapse_card": {
+        "from_id": "q.seed",
+        "to_id": "q.utan_sakerhet",
+        "strength": 0.83,
+        "types": [
+          "serp_overlap"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.83,
+        "bridge_statement": "Direkt relaterat erbjudande/valsteg.",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "mixed",
+            "summary": "SERP overlap proxy + intent/perspective alignment",
+            "confidence": 0.83
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.seed",
+      "to": "q.lag_ranta",
+      "strength": 0.86,
+      "types": [
+        "serp_overlap"
+      ],
+      "synapse_card": {
+        "from_id": "q.seed",
+        "to_id": "q.lag_ranta",
+        "strength": 0.86,
+        "types": [
+          "serp_overlap"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.86,
+        "bridge_statement": "Direkt relaterat erbjudande/valsteg.",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "mixed",
+            "summary": "SERP overlap proxy + intent/perspective alignment",
+            "confidence": 0.86
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.seed",
+      "to": "q.jamfor",
+      "strength": 0.78,
+      "types": [
+        "serp_overlap"
+      ],
+      "synapse_card": {
+        "from_id": "q.seed",
+        "to_id": "q.jamfor",
+        "strength": 0.78,
+        "types": [
+          "serp_overlap"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.78,
+        "bridge_statement": "Direkt relaterat erbjudande/valsteg.",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "mixed",
+            "summary": "SERP overlap proxy + intent/perspective alignment",
+            "confidence": 0.78
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.seed",
+      "to": "q.basta",
+      "strength": 0.8,
+      "types": [
+        "serp_overlap"
+      ],
+      "synapse_card": {
+        "from_id": "q.seed",
+        "to_id": "q.basta",
+        "strength": 0.8,
+        "types": [
+          "serp_overlap"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.8,
+        "bridge_statement": "Direkt relaterat erbjudande/valsteg.",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "mixed",
+            "summary": "SERP overlap proxy + intent/perspective alignment",
+            "confidence": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.seed",
+      "to": "q.ranta_jamf",
+      "strength": 0.76,
+      "types": [
+        "serp_overlap"
+      ],
+      "synapse_card": {
+        "from_id": "q.seed",
+        "to_id": "q.ranta_jamf",
+        "strength": 0.76,
+        "types": [
+          "serp_overlap"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.76,
+        "bridge_statement": "Direkt relaterat erbjudande/valsteg.",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "mixed",
+            "summary": "SERP overlap proxy + intent/perspective alignment",
+            "confidence": 0.76
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.seed",
+      "to": "q.betala_av",
+      "strength": 0.45,
+      "types": [
+        "perspective_shift",
+        "facet_transform"
+      ],
+      "synapse_card": {
+        "from_id": "q.seed",
+        "to_id": "q.betala_av",
+        "strength": 0.45,
+        "types": [
+          "perspective_shift",
+          "facet_transform"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.45,
+        "bridge_statement": "Delar privatlån/800 000 men handlar om återbetalning (annan användarresa).",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "mixed",
+            "summary": "Low SERP overlap proxy; perspective mismatch",
+            "confidence": 0.45
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.seed",
+      "to": "q.amortera",
+      "strength": 0.4,
+      "types": [
+        "perspective_shift",
+        "facet_transform"
+      ],
+      "synapse_card": {
+        "from_id": "q.seed",
+        "to_id": "q.amortera",
+        "strength": 0.4,
+        "types": [
+          "perspective_shift",
+          "facet_transform"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.4,
+        "bridge_statement": "Delar privatlån/800 000 men handlar om återbetalning (annan användarresa).",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "mixed",
+            "summary": "Low SERP overlap proxy; perspective mismatch",
+            "confidence": 0.4
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.seed",
+      "to": "q.avbetal",
+      "strength": 0.5,
+      "types": [
+        "perspective_shift",
+        "facet_transform"
+      ],
+      "synapse_card": {
+        "from_id": "q.seed",
+        "to_id": "q.avbetal",
+        "strength": 0.5,
+        "types": [
+          "perspective_shift",
+          "facet_transform"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.5,
+        "bridge_statement": "Delar privatlån/800 000 men handlar om återbetalning (annan användarresa).",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "mixed",
+            "summary": "Low SERP overlap proxy; perspective mismatch",
+            "confidence": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.seed",
+      "to": "q.hur_mkt",
+      "strength": 0.6,
+      "types": [
+        "serp_overlap"
+      ],
+      "synapse_card": {
+        "from_id": "q.seed",
+        "to_id": "q.hur_mkt",
+        "strength": 0.6,
+        "types": [
+          "serp_overlap"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.6,
+        "bridge_statement": "Direkt relaterat erbjudande/valsteg.",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "mixed",
+            "summary": "SERP overlap proxy + intent/perspective alignment",
+            "confidence": 0.6
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.seed",
+      "to": "q.kvar",
+      "strength": 0.35,
+      "types": [
+        "perspective_shift",
+        "facet_transform"
+      ],
+      "synapse_card": {
+        "from_id": "q.seed",
+        "to_id": "q.kvar",
+        "strength": 0.35,
+        "types": [
+          "perspective_shift",
+          "facet_transform"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.35,
+        "bridge_statement": "Delar privatlån/800 000 men handlar om återbetalning (annan användarresa).",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "mixed",
+            "summary": "Low SERP overlap proxy; perspective mismatch",
+            "confidence": 0.35
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.seed",
+      "to": "q.lagen",
+      "strength": 0.45,
+      "types": [
+        "perspective_shift",
+        "facet_transform"
+      ],
+      "synapse_card": {
+        "from_id": "q.seed",
+        "to_id": "q.lagen",
+        "strength": 0.45,
+        "types": [
+          "perspective_shift",
+          "facet_transform"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.45,
+        "bridge_statement": "Delar privatlån/800 000 men handlar om återbetalning (annan användarresa).",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "mixed",
+            "summary": "Low SERP overlap proxy; perspective mismatch",
+            "confidence": 0.45
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.seed",
+      "to": "q.rantetak",
+      "strength": 0.5,
+      "types": [
+        "perspective_shift",
+        "facet_transform"
+      ],
+      "synapse_card": {
+        "from_id": "q.seed",
+        "to_id": "q.rantetak",
+        "strength": 0.5,
+        "types": [
+          "perspective_shift",
+          "facet_transform"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.5,
+        "bridge_statement": "Delar privatlån/800 000 men handlar om återbetalning (annan användarresa).",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "mixed",
+            "summary": "Low SERP overlap proxy; perspective mismatch",
+            "confidence": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.jamfor",
+      "to": "q.basta",
+      "strength": 0.72,
+      "types": [
+        "facet_transform"
+      ],
+      "synapse_card": {
+        "from_id": "q.jamfor",
+        "to_id": "q.basta",
+        "strength": 0.72,
+        "types": [
+          "facet_transform"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.72,
+        "bridge_statement": "Samma jämför-intent, superlativ-variant.",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "intra",
+            "summary": "cluster cohesion signals",
+            "confidence": 0.72
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.betala_av",
+      "to": "q.amortera",
+      "strength": 0.8,
+      "types": [
+        "task_chain"
+      ],
+      "synapse_card": {
+        "from_id": "q.betala_av",
+        "to_id": "q.amortera",
+        "strength": 0.8,
+        "types": [
+          "task_chain"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.8,
+        "bridge_statement": "Amortera är ett sätt att betala av snabbare.",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "intra",
+            "summary": "cluster cohesion signals",
+            "confidence": 0.8
+          }
+        ]
+      }
+    },
+    {
+      "from": "q.lagen",
+      "to": "q.rantetak",
+      "strength": 0.7,
+      "types": [
+        "shared_entity"
+      ],
+      "synapse_card": {
+        "from_id": "q.lagen",
+        "to_id": "q.rantetak",
+        "strength": 0.7,
+        "types": [
+          "shared_entity"
+        ],
+        "direction": "bidirectional",
+        "intent_shift": "",
+        "perspective_shift": "",
+        "confidence": 0.7,
+        "bridge_statement": "Regelverk kring ränta hör ihop.",
+        "evidence": [
+          {
+            "source": "serp_top_urls",
+            "kind": "intra",
+            "summary": "cluster cohesion signals",
+            "confidence": 0.7
+          }
+        ]
+      }
+    }
+  ],
+  "clusters": [
+    {
+      "id": "A",
+      "label": "A: Ansöka om lån",
+      "color": "#e53e3e",
+      "dominant_intent": "transactional",
+      "dominant_perspective": "provider",
+      "centroid": {
+        "x": 0.78,
+        "y": 0.8
+      },
+      "node_ids": [
+        "q.ansok",
+        "q.uc",
+        "q.snabbt",
+        "q.utan_sakerhet",
+        "q.lag_ranta"
+      ],
+      "hub_entities": [
+        "privatlån"
+      ]
+    },
+    {
+      "id": "B",
+      "label": "B: Jämföra lån",
+      "color": "#ed8936",
+      "dominant_intent": "commercial",
+      "dominant_perspective": "advisor",
+      "centroid": {
+        "x": 0.58,
+        "y": 0.5
+      },
+      "node_ids": [
+        "q.jamfor",
+        "q.basta",
+        "q.ranta_jamf"
+      ],
+      "hub_entities": [
+        "privatlån"
+      ]
+    },
+    {
+      "id": "C",
+      "label": "C: Hantera befintligt",
+      "color": "#4299e1",
+      "dominant_intent": "informational",
+      "dominant_perspective": "seeker",
+      "centroid": {
+        "x": 0.7,
+        "y": 0.25
+      },
+      "node_ids": [
+        "q.betala_av",
+        "q.amortera",
+        "q.avbetal"
+      ],
+      "hub_entities": [
+        "privatlån"
+      ]
+    },
+    {
+      "id": "D",
+      "label": "D: Ekonomisk planering",
+      "color": "#68d391",
+      "dominant_intent": "informational",
+      "dominant_perspective": "seeker",
+      "centroid": {
+        "x": 0.28,
+        "y": 0.25
+      },
+      "node_ids": [
+        "q.hur_mkt",
+        "q.kvar"
+      ],
+      "hub_entities": [
+        "privatlån"
+      ]
+    },
+    {
+      "id": "E",
+      "label": "E: Regelverk",
+      "color": "#9f7aea",
+      "dominant_intent": "informational",
+      "dominant_perspective": "regulator",
+      "centroid": {
+        "x": 0.25,
+        "y": 0.6
+      },
+      "node_ids": [
+        "q.lagen",
+        "q.rantetak"
+      ],
+      "hub_entities": [
+        "privatlån"
+      ]
+    }
+  ],
+  "legend": {
+    "intent_axis": "informational -> transactional",
+    "perspective_axis": "seeker -> provider",
+    "strength_buckets": [
+      {
+        "min": 0.0,
+        "max": 0.49,
+        "label": "weak"
+      },
+      {
+        "min": 0.5,
+        "max": 0.69,
+        "label": "medium"
+      },
+      {
+        "min": 0.7,
+        "max": 1.0,
+        "label": "strong"
+      }
+    ]
+  },
+  "warnings": []
+}

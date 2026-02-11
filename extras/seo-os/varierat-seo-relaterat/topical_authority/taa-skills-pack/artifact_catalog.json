@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "artifacts": {
+    "first-party-ingest": ["out/ingest/entity_metrics.parquet", "out/ingest/cannibalization.json", "out/ingest/decay_report.json", "out/ingest/unmapped_queries.csv"],
+    "render-crawler": ["out/crawl/url_index.csv", "out/crawl/audit_issues.md", "out/crawl/schema_inventory.json", "out/crawl/budget_simulation.csv"],
+    "entity-reconciler": ["out/entities/reconciled_entities.json", "out/entities/author_org_graph.json", "out/entities/alias_index.tsv", "out/entities/provenance_manifest.json"],
+    "competitive-modeler": ["out/competitive/coverage_matrix.csv", "out/competitive/opportunity_heatmap.png", "out/competitive/feature_playbook.md"],
+    "impact-forecaster": ["out/forecast/backlog_prioritized.csv", "out/forecast/assumptions.yaml", "out/forecast/confidence_bands.json"],
+    "link-graph-analytics": ["out/links/graph_metrics.csv", "out/links/decay_report.csv", "out/links/recommendations.md"],
+    "quality-harness": ["out/quality/quality_report.csv", "out/quality/fact_check.json", "out/quality/thin_content_list.md"],
+    "programmatic-factory": ["out/programmatic/pages/*.html", "out/programmatic/noindex_list.txt", "out/programmatic/manifest.json"],
+    "schema-compiler": ["out/schema/jsonld/*.json", "out/schema/validation_report.md", "out/schema/feature_scores.csv"],
+    "monitoring-agent": ["out/monitoring/diff_report.md", "out/monitoring/alerts.json", "out/monitoring/run_log/{timestamp}.log"],
+    "delivery-devops": ["out/deploy/manifest.json", "out/deploy/logs/{timestamp}.log", "out/deploy/rollback_manifest.json"]
+  }
+}

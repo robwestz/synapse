@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="850">
+  <style>
+    text { font-family: 'Inter', sans-serif; font-size: 14px; fill: #222; }
+    .node { stroke: #444; stroke-width: 1.4; fill: #fff; }
+    .group { stroke-dasharray: 6,3; stroke: #999; fill: none; }
+    .arrow { stroke: #666; stroke-width: 1.5; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#666"></path>
+    </marker>
+  </defs>
+
+  <!-- GROUPS -->
+  <rect x="40" y="40" width="320" height="220" class="group"></rect>
+  <text x="60" y="60" font-weight="bold">📥 INPUT &amp; DATA</text>
+
+  <rect x="420" y="40" width="320" height="220" class="group"></rect>
+  <text x="440" y="60" font-weight="bold">📊 MODEL &amp; ANALYSIS</text>
+
+  <rect x="800" y="40" width="320" height="220" class="group"></rect>
+  <text x="820" y="60" font-weight="bold">📄 OUTPUT &amp; CONTENT</text>
+
+  <rect x="40" y="340" width="1080" height="220" class="group"></rect>
+  <text x="60" y="360" font-weight="bold">🔄 MONITORING &amp; DELIVERY</text>
+
+  <!-- INPUT NODES -->
+  <rect x="80" y="90" width="140" height="40" rx="6" class="node"></rect>
+  <text x="100" y="115">first-party-ingest</text>
+
+  <rect x="80" y="150" width="140" height="40" rx="6" class="node"></rect>
+  <text x="100" y="175">render-crawler</text>
+
+  <rect x="80" y="210" width="140" height="40" rx="6" class="node"></rect>
+  <text x="100" y="235">entity-reconciler</text>
+
+  <!-- MODEL NODES -->
+  <rect x="460" y="90" width="140" height="40" rx="6" class="node"></rect>
+  <text x="480" y="115">competitive-modeler</text>
+
+  <rect x="460" y="150" width="140" height="40" rx="6" class="node"></rect>
+  <text x="480" y="175">impact-forecaster</text>
+
+  <rect x="460" y="210" width="140" height="40" rx="6" class="node"></rect>
+  <text x="480" y="235">link-graph-analytics</text>
+
+  <!-- OUTPUT NODES -->
+  <rect x="840" y="90" width="140" height="40" rx="6" class="node"></rect>
+  <text x="860" y="115">quality-harness</text>
+
+  <rect x="840" y="150" width="140" height="40" rx="6" class="node"></rect>
+  <text x="860" y="175">programmatic-factory</text>
+
+  <rect x="840" y="210" width="140" height="40" rx="6" class="node"></rect>
+  <text x="860" y="235">schema-compiler</text>
+
+  <!-- MONITORING -->
+  <rect x="200" y="400" width="140" height="40" rx="6" class="node"></rect>
+  <text x="220" y="425">monitoring-agent</text>
+
+  <rect x="460" y="400" width="140" height="40" rx="6" class="node"></rect>
+  <text x="480" y="425">delivery-devops</text>
+
+  <!-- ARROWS -->
+  <line x1="220" y1="110" x2="460" y2="110" class="arrow"></line>
+  <line x1="220" y1="170" x2="460" y2="170" class="arrow"></line>
+  <line x1="220" y1="230" x2="460" y2="230" class="arrow"></line>
+
+  <line x1="600" y1="110" x2="840" y2="110" class="arrow"></line>
+  <line x1="600" y1="170" x2="840" y2="170" class="arrow"></line>
+  <line x1="600" y1="230" x2="840" y2="230" class="arrow"></line>
+
+  <!-- OUTPUT to MONITOR -->
+  <line x1="910" y1="230" x2="270" y2="400" class="arrow"></line>
+  <line x1="910" y1="170" x2="530" y2="400" class="arrow"></line>
+
+  <!-- LABELS -->
+  <text x="110" y="290" font-style="italic" fill="#777">Input Layer</text>
+  <text x="480" y="290" font-style="italic" fill="#777">Analysis Layer</text>
+  <text x="870" y="290" font-style="italic" fill="#777">Output Layer</text>
+  <text x="460" y="480" font-style="italic" fill="#777">Continuous Optimization Loop</text>
+
+</svg>

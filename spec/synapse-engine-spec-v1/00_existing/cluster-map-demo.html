@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEO Synapse Map — Privatlån 800 000</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0f1117; color: #e0e0e0; overflow: hidden;
+  }
+  #container { width: 100vw; height: 100vh; position: relative; }
+  
+  /* Header */
+  .header {
+    position: absolute; top: 0; left: 0; right: 0; z-index: 10;
+    padding: 16px 24px; background: linear-gradient(180deg, #0f1117 60%, transparent);
+  }
+  .header h1 { font-size: 16px; font-weight: 600; color: #a0aec0; letter-spacing: 0.5px; }
+  .header .seed { font-size: 13px; color: #68d391; margin-top: 4px; }
+  
+  /* Axes labels */
+  .axis-label {
+    position: absolute; font-size: 11px; color: #4a5568; 
+    text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;
+  }
+  .axis-x-left { bottom: 50%; left: 24px; transform: rotate(-90deg) translateX(50%); transform-origin: left; }
+  .axis-x-right { bottom: 50%; right: 24px; transform: rotate(90deg) translateX(-50%); transform-origin: right; }
+  .axis-y-top { top: 70px; left: 50%; transform: translateX(-50%); }
+  .axis-y-bottom { bottom: 20px; left: 50%; transform: translateX(-50%); }
+  
+  /* Intent arrow */
+  .intent-arrow {
+    position: absolute; bottom: 45px; left: 50%; transform: translateX(-50%);
+    width: 60%; height: 2px; background: linear-gradient(90deg, #4299e1 0%, #e53e3e 100%);
+    opacity: 0.2;
+  }
+  .intent-arrow::before { 
+    content: 'INFORMATIONAL'; position: absolute; left: 0; top: -16px;
+    font-size: 9px; color: #4299e1; letter-spacing: 1px; opacity: 0.6;
+  }
+  .intent-arrow::after { 
+    content: 'TRANSACTIONAL'; position: absolute; right: 0; top: -16px;
+    font-size: 9px; color: #e53e3e; letter-spacing: 1px; opacity: 0.6;
+  }
+  
+  /* Perspective arrow */
+  .perspective-arrow {
+    position: absolute; left: 45px; top: 50%; transform: translateY(-50%);
+    width: 2px; height: 55%; background: linear-gradient(180deg, #68d391 0%, #ed8936 100%);
+    opacity: 0.2;
+  }
+  .perspective-arrow::before {
+    content: 'SEEKER'; position: absolute; top: -20px; left: -14px;
+    font-size: 9px; color: #68d391; letter-spacing: 1px; opacity: 0.6;
+  }
+  .perspective-arrow::after {
+    content: 'PROVIDER'; position: absolute; bottom: -20px; left: -18px;
+    font-size: 9px; color: #ed8936; letter-spacing: 1px; opacity: 0.6;
+  }
+  
+  /* Canvas */
+  svg { width: 100%; height: 100%; }
+  
+  /* Cluster zones */
+  .cluster-zone { opacity: 0.06; }
+  .cluster-zone:hover { opacity: 0.12; }
+  
+  /* Nodes */
+  .node { cursor: pointer; transition: all 0.2s; }
+  .node:hover .node-circle { filter: brightness(1.4); }
+  .node-circle { transition: all 0.3s; }
+  .node-label { 
+    font-size: 10px; fill: #a0aec0; text-anchor: middle;
+    pointer-events: none; transition: all 0.2s;
+  }
+  .node:hover .node-label { fill: #fff; font-weight: 600; }
+  
+  /* Seed node */
+  .seed-pulse { animation: pulse 2s infinite; }
+  @keyframes pulse {
+    0%, 100% { r: 18; opacity: 0.3; }
+    50% { r: 24; opacity: 0.1; }
+  }
+  
+  /* Edges */
+  .edge { stroke-opacity: 0.15; transition: stroke-opacity 0.2s; }
+  .edge.highlighted { stroke-opacity: 0.6; }
+  
+  /* Tooltip */
+  .tooltip {
+    position: absolute; display: none; background: #1a1d28; border: 1px solid #2d3748;
+    border-radius: 8px; padding: 12px 16px; max-width: 320px; z-index: 100;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5); pointer-events: none;
+  }
+  .tooltip.visible { display: block; }
+  .tooltip h3 { font-size: 13px; color: #fff; margin-bottom: 6px; }
+  .tooltip .meta { font-size: 11px; color: #718096; margin-bottom: 8px; }
+  .tooltip .synapse { 
+    font-size: 11px; color: #a0aec0; padding: 6px 8px;
+    background: #0f1117; border-radius: 4px; line-height: 1.5;
+  }
+  .tooltip .tag {
+    display: inline-block; padding: 2px 6px; border-radius: 3px;
+    font-size: 10px; margin-right: 4px; font-weight: 600;
+  }
+  .tag-intent { background: #2d3748; color: #63b3ed; }
+  .tag-perspective { background: #2d3748; color: #68d391; }
+  .tag-strength { background: #2d3748; color: #f6ad55; }
+  
+  /* Legend */
+  .legend {
+    position: absolute; bottom: 16px; right: 16px; z-index: 10;
+    background: #1a1d28; border: 1px solid #2d3748; border-radius: 8px;
+    padding: 12px 16px; font-size: 11px;
+  }
+  .legend-title { color: #718096; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-size: 9px; }
+  .legend-item { display: flex; align-items: center; margin-bottom: 4px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; flex-shrink: 0; }
+  .legend-text { color: #a0aec0; }
+  
+  /* Danger zone highlight */
+  .danger-zone {
+    position: absolute; z-index: 5; padding: 6px 10px; border-radius: 4px;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.5px;
+    background: rgba(229, 62, 62, 0.1); border: 1px dashed rgba(229, 62, 62, 0.3);
+    color: #fc8181; display: none;
+  }
+  .danger-zone.visible { display: block; }
+  
+  /* Instruction */
+  .instruction {
+    position: absolute; top: 80px; right: 24px; z-index: 10;
+    font-size: 11px; color: #4a5568; max-width: 200px; text-align: right;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+<div id="container">
+  <div class="header">
+    <h1>SYNAPSE MAP — Topical Authority</h1>
+    <div class="seed">Seed: "privatlån upp till 800 000" → 30 närmast relaterade</div>
+  </div>
+  
+  <div class="instruction">
+    Hovra över en nod för att se synapsen.<br>
+    <strong style="color:#fc8181">Röda linjer</strong> = svaga kopplingar<br>
+    <strong style="color:#68d391">Gröna linjer</strong> = starka kopplingar
+  </div>
+  
+  <div class="intent-arrow"></div>
+  <div class="perspective-arrow"></div>
+  
+  <div class="tooltip" id="tooltip"></div>
+  <div class="danger-zone" id="danger-zone">⚠ FEL KLUSTER FÖR ANKARTEXT</div>
+  
+  <div class="legend">
+    <div class="legend-title">Kluster</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e53e3e"></div><div class="legend-text">A: Ansöka om lån</div></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ed8936"></div><div class="legend-text">B: Jämföra lån</div></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#4299e1"></div><div class="legend-text">C: Hantera befintligt lån</div></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#68d391"></div><div class="legend-text">D: Ekonomisk planering</div></div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9f7aea"></div><div class="legend-text">E: Regelverk</div></div>
+  </div>
+  
+  <svg id="graph"></svg>
+</div>
+
+<script>
+const W = window.innerWidth;
+const H = window.innerHeight;
+const CX = W / 2;
+const CY = H / 2;
+
+// Cluster colors
+const colors = {
+  A: '#e53e3e', // Ansöka - provider/transactional
+  B: '#ed8936', // Jämföra - advisor/commercial
+  C: '#4299e1', // Hantera befintligt - seeker/informational
+  D: '#68d391', // Ekonomisk planering - seeker/informational
+  E: '#9f7aea', // Regelverk - neutral/informational
+};
+
+// Node data: phrase, cluster, x_offset(intent), y_offset(perspective), size, synapse
+const nodes = [
+  // SEED
+  { id: 0, phrase: "privatlån upp till 800 000", cluster: "A", x: 0.65, y: 0.65, size: 16, isSeed: true,
+    synapse: { type: "SEED", strength: 1.0, explanation: "Utgångspunkt. Transaktionell intent, provider-perspektiv (långivaren erbjuder)." }},
+  
+  // Cluster A: Ansöka om lån (provider/transactional) - bottom right
+  { id: 1, phrase: "ansök privatlån online", cluster: "A", x: 0.72, y: 0.70, size: 12,
+    synapse: { type: "Procedurell kedja", strength: 0.92, explanation: "Direkt handlingssteg: ansökan. Samma intent (transactional) och perspektiv (provider)." }},
+  { id: 2, phrase: "privatlån utan UC", cluster: "A", x: 0.60, y: 0.62, size: 11,
+    synapse: { type: "Attribut-expansion", strength: 0.85, explanation: "Kvalificerare 'utan UC' modifierar produkten. Kvarvarande transaktionell intent." }},
+  { id: 3, phrase: "snabbt privatlån 800 000", cluster: "A", x: 0.68, y: 0.58, size: 10,
+    synapse: { type: "Attribut-expansion", strength: 0.88, explanation: "Attributet 'snabbt' lägger tidsdimension. Samma core-entitet och belopp." }},
+  { id: 4, phrase: "låna 800 000 utan säkerhet", cluster: "A", x: 0.74, y: 0.60, size: 9,
+    synapse: { type: "Entitets-delning", strength: 0.83, explanation: "Delar entiteterna [privatlån, 800 000]. 'Utan säkerhet' = attribut som preciserar." }},
+  { id: 5, phrase: "privatlån låg ränta", cluster: "A", x: 0.58, y: 0.72, size: 11,
+    synapse: { type: "Attribut-expansion", strength: 0.86, explanation: "Ränta är central entitet kopplad till privatlån. Provider-format." }},
+  
+  // Cluster B: Jämföra lån (advisor/commercial) - center-right
+  { id: 6, phrase: "jämför privatlån", cluster: "B", x: 0.55, y: 0.45, size: 13,
+    synapse: { type: "Intent-skift", strength: 0.78, explanation: "Samma entitet, men intent skiftar från transactional → commercial investigation. Perspektiv: advisor." }},
+  { id: 7, phrase: "bästa privatlånet 2025", cluster: "B", x: 0.60, y: 0.48, size: 12,
+    synapse: { type: "Attribut + Intent-skift", strength: 0.80, explanation: "Superlativ 'bästa' signalerar utvärdering. Freshness ('2025') ökar aktualitet." }},
+  { id: 8, phrase: "privatlån ränta jämförelse", cluster: "B", x: 0.52, y: 0.52, size: 10,
+    synapse: { type: "Facet-transform", strength: 0.76, explanation: "Fokuserar på ränta-facetten i jämförelsekontext. Advisor-perspektiv." }},
+  { id: 9, phrase: "billigast privatlån 2025", cluster: "B", x: 0.48, y: 0.42, size: 9,
+    synapse: { type: "Jämförande", strength: 0.74, explanation: "Superlativ 'billigast' → komparativ intent. Sökaren vill rangordna." }},
+  { id: 10, phrase: "SBAB vs Nordea privatlån", cluster: "B", x: 0.62, y: 0.40, size: 8,
+    synapse: { type: "Jämförande + Entitet", strength: 0.65, explanation: "Brand-entiteter (SBAB, Nordea) i versus-kontext. Specifik jämförelse." }},
+  { id: 11, phrase: "privatlån recension", cluster: "B", x: 0.50, y: 0.38, size: 8,
+    synapse: { type: "Intent-skift", strength: 0.70, explanation: "Transaktionell → utvärderande. 'Recension' = stark commercial investigation-signal." }},
+  
+  // Cluster C: Hantera befintligt lån (seeker/mixed) - top right
+  { id: 12, phrase: "betala av privatlån 800 000", cluster: "C", x: 0.60, y: 0.22, size: 12,
+    synapse: { type: "Perspektiv-skift", strength: 0.45, explanation: "⚠ SVAG SYNAPS. Delar entiteter men perspektivet inverteras: provider→seeker. SERP-overlap: ~15%. INTE lämplig som ankartext till seed." }},
+  { id: 13, phrase: "amortera privatlån snabbare", cluster: "C", x: 0.55, y: 0.18, size: 10,
+    synapse: { type: "Procedurell (post-action)", strength: 0.40, explanation: "Temporal kedja: efter att lån tagits → avbetalning. Helt annan SERP." }},
+  { id: 14, phrase: "privatlån avbetalningsplan", cluster: "C", x: 0.65, y: 0.25, size: 9,
+    synapse: { type: "Entitets-delning", strength: 0.50, explanation: "Delar 'privatlån' men facet skiftar: erbjudande → hantering." }},
+  { id: 15, phrase: "räkna ut månadskostnad lån", cluster: "C", x: 0.50, y: 0.28, size: 10,
+    synapse: { type: "Procedurell + HowTo", strength: 0.48, explanation: "Verktygs-intent. Seeker vill beräkna. Angränsar till beslutsfasen." }},
+  { id: 16, phrase: "ångerrätt privatlån 14 dagar", cluster: "C", x: 0.68, y: 0.30, size: 7,
+    synapse: { type: "Problem/lösning", strength: 0.42, explanation: "Post-purchase problem. Helt annan användarresa." }},
+  
+  // Cluster D: Ekonomisk planering (seeker/informational) - top left
+  { id: 17, phrase: "hur mycket kan jag låna", cluster: "D", x: 0.30, y: 0.25, size: 12,
+    synapse: { type: "Procedurell (pre-action)", strength: 0.60, explanation: "Steg FÖRE ansökan. Pre-kvalificering. Seeker utforskar möjligheter." }},
+  { id: 18, phrase: "kvar att leva på efter lån", cluster: "D", x: 0.22, y: 0.20, size: 9,
+    synapse: { type: "Kontextuell brygga", strength: 0.35, explanation: "Brygga till privatekonomi. Svag koppling till seed men viktig för topical authority." }},
+  { id: 19, phrase: "skuldsanering privatlån", cluster: "D", x: 0.25, y: 0.15, size: 8,
+    synapse: { type: "Problem/lösning", strength: 0.30, explanation: "Allvarlig problem-fas. Långt ifrån seed i intent och perspektiv. Annan SERP helt." }},
+  { id: 20, phrase: "samla lån och krediter", cluster: "D", x: 0.35, y: 0.30, size: 10,
+    synapse: { type: "Alternativ/jämförande", strength: 0.45, explanation: "Alternativt koncept (refinansiering). Delad entitet 'lån' men annan intent." }},
+  { id: 21, phrase: "löneberäkning lånelöfte", cluster: "D", x: 0.28, y: 0.32, size: 8,
+    synapse: { type: "Procedurell (pre-action)", strength: 0.50, explanation: "Pre-kvalificering. Brygga mellan ekonomisk planering och ansökan." }},
+  { id: 22, phrase: "budget med lån 800 000", cluster: "D", x: 0.32, y: 0.22, size: 7,
+    synapse: { type: "Entitet + kontextuell brygga", strength: 0.40, explanation: "Delar beloppet men perspektiv=seeker, intent=informational." }},
+  
+  // Cluster E: Regelverk (neutral/informational) - bottom left
+  { id: 23, phrase: "konsumentkreditlagen privatlån", cluster: "E", x: 0.22, y: 0.55, size: 9,
+    synapse: { type: "Kontextuell brygga", strength: 0.45, explanation: "Juridisk kontext. Bridging entity mellan finans och lagstiftning." }},
+  { id: 24, phrase: "räntetak privatlån Sverige", cluster: "E", x: 0.28, y: 0.60, size: 8,
+    synapse: { type: "Entitet + regulatorisk", strength: 0.50, explanation: "Ränta-entiteten i regulatorisk kontext. Informational." }},
+  { id: 25, phrase: "Finansinspektionen privatlån", cluster: "E", x: 0.20, y: 0.50, size: 7,
+    synapse: { type: "Entitets-association", strength: 0.40, explanation: "Named entity (myndighet) kopplad till domänen. Navigational-inslag." }},
+  { id: 26, phrase: "kreditprövning privatlån krav", cluster: "E", x: 0.32, y: 0.52, size: 9,
+    synapse: { type: "Procedurell", strength: 0.55, explanation: "Steg i ansökningsprocessen men informational intent. Neutral perspektiv." }},
+  { id: 27, phrase: "effektiv ränta privatlån", cluster: "E", x: 0.35, y: 0.58, size: 10,
+    synapse: { type: "Taxonomisk (child)", strength: 0.60, explanation: "Specifik metric kopplad till privatlån. Informational + consumer protection angle." }},
+  
+  // Bridge nodes
+  { id: 28, phrase: "privatlån fördelar nackdelar", cluster: "B", x: 0.42, y: 0.35, size: 9,
+    synapse: { type: "BRIDGE: A↔C↔D", strength: 0.55, explanation: "Bryggnod som kopplar erbjudande-klustret (A) med planering (D). Advisor-perspektiv." }},
+  { id: 29, phrase: "vad kostar privatlån per månad", cluster: "D", x: 0.38, y: 0.38, size: 10,
+    synapse: { type: "BRIDGE: A↔D", strength: 0.58, explanation: "Brygga mellan kostnadsmedvetenhet (D) och produkt (A). Före beslut." }},
+];
+
+// Edges (from, to, strength)
+const edges = [
+  // Cluster A internal
+  [0,1,0.92], [0,2,0.85], [0,3,0.88], [0,4,0.83], [0,5,0.86],
+  [1,3,0.80], [2,4,0.75], [3,5,0.70],
+  // Cluster B internal
+  [6,7,0.82], [6,8,0.78], [7,9,0.72], [8,11,0.68], [9,10,0.60],
+  // Cluster C internal
+  [12,13,0.80], [12,14,0.75], [13,15,0.70], [14,16,0.55],
+  // Cluster D internal
+  [17,18,0.65], [17,21,0.70], [18,19,0.60], [20,21,0.55], [20,22,0.50],
+  // Cluster E internal
+  [23,24,0.72], [23,25,0.65], [24,27,0.70], [26,27,0.68],
+  // Cross-cluster (weaker)
+  [0,6,0.78], [0,7,0.75],   // A→B
+  [0,12,0.45],               // A→C (WEAK - the key insight!)
+  [0,17,0.60],               // A→D
+  [0,27,0.55],               // A→E
+  [6,28,0.55], [28,17,0.50], // B↔bridge↔D
+  [5,29,0.58], [29,17,0.55], // A↔bridge↔D
+  [12,19,0.40],               // C→D
+  [26,6,0.45],                // E→B
+];
+
+// Convert x,y (0-1) to pixel positions with padding
+function toX(x) { return 80 + x * (W - 160); }
+function toY(y) { return 90 + y * (H - 160); }
+
+const svg = document.getElementById('graph');
+const tooltip = document.getElementById('tooltip');
+const dangerZone = document.getElementById('danger-zone');
+
+// Draw cluster zones (ellipses)
+const clusterCenters = {};
+['A','B','C','D','E'].forEach(c => {
+  const clusterNodes = nodes.filter(n => n.cluster === c);
+  const avgX = clusterNodes.reduce((s,n) => s + n.x, 0) / clusterNodes.length;
+  const avgY = clusterNodes.reduce((s,n) => s + n.y, 0) / clusterNodes.length;
+  clusterCenters[c] = { x: avgX, y: avgY };
+  
+  const el = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+  el.setAttribute('cx', toX(avgX));
+  el.setAttribute('cy', toY(avgY));
+  el.setAttribute('rx', 120);
+  el.setAttribute('ry', 90);
+  el.setAttribute('fill', colors[c]);
+  el.setAttribute('class', 'cluster-zone');
+  svg.appendChild(el);
+});
+
+// Draw edges
+edges.forEach(([from, to, strength]) => {
+  const n1 = nodes[from], n2 = nodes[to];
+  const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+  line.setAttribute('x1', toX(n1.x));
+  line.setAttribute('y1', toY(n1.y));
+  line.setAttribute('x2', toX(n2.x));
+  line.setAttribute('y2', toY(n2.y));
+  
+  // Color: green for strong, yellow for medium, red for weak
+  let color;
+  if (strength > 0.7) color = '#68d391';
+  else if (strength > 0.5) color = '#ecc94b';
+  else color = '#fc8181';
+  
+  line.setAttribute('stroke', color);
+  line.setAttribute('stroke-width', Math.max(1, strength * 3));
+  line.setAttribute('class', 'edge');
+  line.setAttribute('data-from', from);
+  line.setAttribute('data-to', to);
+  svg.appendChild(line);
+});
+
+// Draw nodes
+nodes.forEach(n => {
+  const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  g.setAttribute('class', 'node');
+  g.setAttribute('data-id', n.id);
+  
+  // Seed pulse
+  if (n.isSeed) {
+    const pulse = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    pulse.setAttribute('cx', toX(n.x));
+    pulse.setAttribute('cy', toY(n.y));
+    pulse.setAttribute('r', 18);
+    pulse.setAttribute('fill', 'none');
+    pulse.setAttribute('stroke', colors[n.cluster]);
+    pulse.setAttribute('stroke-width', 2);
+    pulse.setAttribute('class', 'seed-pulse');
+    g.appendChild(pulse);
+  }
+  
+  // Circle
+  const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+  circle.setAttribute('cx', toX(n.x));
+  circle.setAttribute('cy', toY(n.y));
+  circle.setAttribute('r', n.size);
+  circle.setAttribute('fill', colors[n.cluster]);
+  circle.setAttribute('fill-opacity', n.synapse.strength > 0.6 ? 0.8 : 0.5);
+  circle.setAttribute('stroke', n.isSeed ? '#fff' : colors[n.cluster]);
+  circle.setAttribute('stroke-width', n.isSeed ? 2 : 1);
+  circle.setAttribute('class', 'node-circle');
+  g.appendChild(circle);
+  
+  // Label
+  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  text.setAttribute('x', toX(n.x));
+  text.setAttribute('y', toY(n.y) + n.size + 14);
+  text.setAttribute('class', 'node-label');
+  text.textContent = n.phrase.length > 28 ? n.phrase.substring(0, 26) + '…' : n.phrase;
+  g.appendChild(text);
+  
+  // Seed marker
+  if (n.isSeed) {
+    const star = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    star.setAttribute('x', toX(n.x));
+    star.setAttribute('y', toY(n.y) + 5);
+    star.setAttribute('text-anchor', 'middle');
+    star.setAttribute('fill', '#fff');
+    star.setAttribute('font-size', '14px');
+    star.textContent = '★';
+    g.appendChild(star);
+  }
+  
+  // Hover events
+  g.addEventListener('mouseenter', (e) => showTooltip(e, n));
+  g.addEventListener('mouseleave', hideTooltip);
+  g.addEventListener('mouseenter', () => highlightEdges(n.id));
+  g.addEventListener('mouseleave', unhighlightEdges);
+  
+  svg.appendChild(g);
+});
+
+// Cluster labels
+const clusterLabels = {
+  A: { label: 'A: ANSÖKA OM LÅN', sub: 'transactional · provider' },
+  B: { label: 'B: JÄMFÖRA LÅN', sub: 'commercial · advisor' },
+  C: { label: 'C: HANTERA BEFINTLIGT', sub: 'informational · seeker' },
+  D: { label: 'D: EKONOMISK PLANERING', sub: 'informational · seeker' },
+  E: { label: 'E: REGELVERK', sub: 'informational · neutral' },
+};
+
+Object.entries(clusterLabels).forEach(([c, info]) => {
+  const center = clusterCenters[c];
+  const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  text.setAttribute('x', toX(center.x));
+  text.setAttribute('y', toY(center.y) - 95);
+  text.setAttribute('text-anchor', 'middle');
+  text.setAttribute('fill', colors[c]);
+  text.setAttribute('font-size', '11px');
+  text.setAttribute('font-weight', '700');
+  text.setAttribute('letter-spacing', '1px');
+  text.setAttribute('opacity', '0.7');
+  text.textContent = info.label;
+  svg.appendChild(text);
+  
+  const sub = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+  sub.setAttribute('x', toX(center.x));
+  sub.setAttribute('y', toY(center.y) - 80);
+  sub.setAttribute('text-anchor', 'middle');
+  sub.setAttribute('fill', colors[c]);
+  sub.setAttribute('font-size', '9px');
+  sub.setAttribute('opacity', '0.4');
+  sub.textContent = info.sub;
+  svg.appendChild(sub);
+});
+
+function showTooltip(e, node) {
+  const s = node.synapse;
+  const strengthColor = s.strength > 0.7 ? '#68d391' : s.strength > 0.5 ? '#ecc94b' : '#fc8181';
+  const strengthLabel = s.strength > 0.7 ? 'STARK' : s.strength > 0.5 ? 'MEDIUM' : 'SVAG';
+  
+  tooltip.innerHTML = `
+    <h3>${node.phrase}</h3>
+    <div class="meta">
+      <span class="tag tag-intent">${s.type}</span>
+      <span class="tag tag-strength" style="color:${strengthColor}">Styrka: ${s.strength.toFixed(2)} (${strengthLabel})</span>
+    </div>
+    <div class="synapse">${s.explanation}</div>
+  `;
+  
+  let x = e.clientX + 16;
+  let y = e.clientY - 10;
+  if (x + 320 > W) x = e.clientX - 336;
+  if (y + 150 > H) y = H - 160;
+  
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+  tooltip.classList.add('visible');
+  
+  // Show danger zone for weak cross-cluster links
+  if (s.strength < 0.5 && node.cluster !== 'A') {
+    dangerZone.style.left = (toX(node.x) - 80) + 'px';
+    dangerZone.style.top = (toY(node.y) - 40) + 'px';
+    dangerZone.classList.add('visible');
+  }
+}
+
+function hideTooltip() {
+  tooltip.classList.remove('visible');
+  dangerZone.classList.remove('visible');
+}
+
+function highlightEdges(nodeId) {
+  document.querySelectorAll('.edge').forEach(edge => {
+    const from = parseInt(edge.getAttribute('data-from'));
+    const to = parseInt(edge.getAttribute('data-to'));
+    if (from === nodeId || to === nodeId) {
+      edge.classList.add('highlighted');
+    }
+  });
+}
+
+function unhighlightEdges() {
+  document.querySelectorAll('.edge').forEach(e => e.classList.remove('highlighted'));
+}
+</script>
+</body>
+</html>

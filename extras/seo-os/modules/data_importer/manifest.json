@@ -1,0 +1,9 @@
+{
+  "id": "data_importer",
+  "name": "Data Importer",
+  "version": "1.0.0",
+  "description": "Upload and normalize data from Ahrefs, Semrush, and Google Search Console.",
+  "category": "Configuration",
+  "icon": "📥",
+  "entry_point": "ui.py"
+}

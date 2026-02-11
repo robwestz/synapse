@@ -1,0 +1,36 @@
+perspective_model:
+  version: "2026-02-05"
+  perspectives:
+    - id: seeker
+      label: "Sökaren (har behov/problem)"
+      y_position: 0.15
+    - id: advisor
+      label: "Rådgivare/jämförare (utvärderar)"
+      y_position: 0.40
+    - id: neutral
+      label: "Neutral/encyklopedisk"
+      y_position: 0.55
+    - id: regulator
+      label: "Regulator/myndighet/regler"
+      y_position: 0.65
+    - id: provider
+      label: "Provider/säljare/erbjudande"
+      y_position: 0.85
+
+  signals:
+    seeker:
+      phrases: ["jag har", "jag vill", "jag behöver", "mitt", "min", "hjälp", "problem", "betala av", "minska", "slippa"]
+    advisor:
+      phrases: ["bästa", "jämför", "jämförelse", "topplista", "recension", "omdöme", "vi har testat", "vår bedömning"]
+    regulator:
+      phrases: ["lag", "lagen", "regler", "krav", "förordning", "tillsyn", "myndighet", "konsumentskydd", "villkor"]
+    provider:
+      phrases: ["upp till", "ansök", "ansök nu", "erbjuder", "våra", "vi erbjuder", "pris", "ränta", "teckna"]
+
+  distance_matrix:
+    #              provider  seeker  advisor  regulator  neutral
+    provider:     [0.0,     0.8,    0.4,     0.6,       0.3]
+    seeker:       [0.8,     0.0,    0.3,     0.5,       0.2]
+    advisor:      [0.4,     0.3,    0.0,     0.4,       0.2]
+    regulator:    [0.6,     0.5,    0.4,     0.0,       0.3]
+    neutral:      [0.3,     0.2,    0.2,     0.3,       0.0]

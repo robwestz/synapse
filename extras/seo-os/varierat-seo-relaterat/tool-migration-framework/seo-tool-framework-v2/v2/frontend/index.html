@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO Intelligence Platform</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Custom styles -->
+    <style>
+        [x-cloak] { display: none !important; }
+        
+        /* Archetype colors */
+        .archetype-analyzer { --accent: #3B82F6; }
+        .archetype-generator { --accent: #10B981; }
+        .archetype-monitor { --accent: #F59E0B; }
+        .archetype-optimizer { --accent: #8B5CF6; }
+        .archetype-discoverer { --accent: #EF4444; }
+        
+        .accent-border { border-color: var(--accent, #3B82F6); }
+        .accent-bg { background-color: var(--accent, #3B82F6); }
+        .accent-text { color: var(--accent, #3B82F6); }
+        
+        /* Loading animation */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+        .pulse-ring::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            border: 2px solid var(--accent, #3B82F6);
+            animation: pulse-ring 1.5s ease-out infinite;
+        }
+        
+        /* Smooth transitions */
+        .tool-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .tool-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen" x-data="app()" x-init="init()">
+    
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🧠</span>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900">SEO Intelligence Platform</h1>
+                        <p class="text-sm text-gray-500" x-text="`${tools.length} tools available`"></p>
+                    </div>
+                </div>
+                
+                <!-- Search -->
+                <div class="flex-1 max-w-md mx-8">
+                    <input 
+                        type="text" 
+                        x-model="searchQuery"
+                        placeholder="Search tools..."
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                </div>
+                
+                <!-- Filter by archetype -->
+                <div class="flex gap-2">
+                    <button 
+                        @click="selectedArchetype = null"
+                        :class="selectedArchetype === null ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700'"
+                        class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors"
+                    >All</button>
+                    <template x-for="arch in archetypes" :key="arch.id">
+                        <button 
+                            @click="selectedArchetype = arch.id"
+                            :class="selectedArchetype === arch.id ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-700'"
+                            class="px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1"
+                        >
+                            <span x-text="arch.icon"></span>
+                            <span x-text="arch.name"></span>
+                        </button>
+                    </template>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main content -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        
+        <!-- Tool grid -->
+        <div x-show="!selectedTool" x-transition class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <template x-for="tool in filteredTools" :key="tool.id">
+                <div 
+                    @click="selectTool(tool)"
+                    :class="`archetype-${tool.archetype}`"
+                    class="tool-card bg-white rounded-xl p-5 border-l-4 accent-border cursor-pointer shadow-sm"
+                >
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="text-2xl" x-text="tool.icon || getArchetypeIcon(tool.archetype)"></span>
+                            <div>
+                                <h3 class="font-semibold text-gray-900" x-text="tool.name"></h3>
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600" x-text="tool.archetype"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 line-clamp-2" x-text="tool.description || 'No description available'"></p>
+                    
+                    <!-- Quick stats -->
+                    <div class="mt-3 flex items-center gap-4 text-xs text-gray-500">
+                        <span x-show="tool.inputs?.length" x-text="`${tool.inputs.length} inputs`"></span>
+                        <span x-text="tool.category"></span>
+                    </div>
+                </div>
+            </template>
+        </div>
+        
+        <!-- Empty state -->
+        <div x-show="filteredTools.length === 0 && !selectedTool" class="text-center py-12">
+            <span class="text-4xl">🔍</span>
+            <p class="mt-4 text-gray-600">No tools found matching your criteria</p>
+        </div>
+        
+        <!-- Tool detail / execution panel -->
+        <div x-show="selectedTool" x-transition x-cloak>
+            <button 
+                @click="selectedTool = null; result = null"
+                class="mb-4 flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
+                Back to tools
+            </button>
+            
+            <div :class="`archetype-${selectedTool?.archetype}`" class="bg-white rounded-xl shadow-sm overflow-hidden">
+                <!-- Tool header -->
+                <div class="p-6 border-b border-gray-100 accent-bg bg-opacity-5">
+                    <div class="flex items-center gap-4">
+                        <span class="text-4xl" x-text="selectedTool?.icon || getArchetypeIcon(selectedTool?.archetype)"></span>
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900" x-text="selectedTool?.name"></h2>
+                            <p class="text-gray-600" x-text="selectedTool?.description"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 divide-x divide-gray-100">
+                    <!-- Input form -->
+                    <div class="p-6">
+                        <h3 class="font-semibold text-gray-900 mb-4">Input Parameters</h3>
+                        
+                        <form @submit.prevent="executeTool()" class="space-y-4">
+                            <!-- Dynamic form fields -->
+                            <template x-if="selectedTool?.inputs?.length > 0">
+                                <template x-for="input in selectedTool.inputs" :key="input.name">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            <span x-text="input.label || input.name"></span>
+                                            <span x-show="input.required" class="text-red-500">*</span>
+                                        </label>
+                                        
+                                        <!-- Text input -->
+                                        <template x-if="input.type === 'text' || input.type === 'string'">
+                                            <input 
+                                                type="text"
+                                                x-model="formData[input.name]"
+                                                :placeholder="input.placeholder || ''"
+                                                :required="input.required"
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                            >
+                                        </template>
+                                        
+                                        <!-- Number input -->
+                                        <template x-if="input.type === 'number' || input.type === 'integer'">
+                                            <input 
+                                                type="number"
+                                                x-model.number="formData[input.name]"
+                                                :min="input.min"
+                                                :max="input.max"
+                                                :required="input.required"
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                            >
+                                        </template>
+                                        
+                                        <!-- Textarea -->
+                                        <template x-if="input.type === 'textarea'">
+                                            <textarea 
+                                                x-model="formData[input.name]"
+                                                :placeholder="input.placeholder || ''"
+                                                :required="input.required"
+                                                rows="4"
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                            ></textarea>
+                                        </template>
+                                        
+                                        <!-- Select -->
+                                        <template x-if="input.type === 'select'">
+                                            <select 
+                                                x-model="formData[input.name]"
+                                                :required="input.required"
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                            >
+                                                <option value="">Select...</option>
+                                                <template x-for="opt in input.options" :key="opt.value || opt">
+                                                    <option :value="opt.value || opt" x-text="opt.label || opt"></option>
+                                                </template>
+                                            </select>
+                                        </template>
+                                        
+                                        <!-- Checkbox -->
+                                        <template x-if="input.type === 'boolean' || input.type === 'checkbox'">
+                                            <label class="flex items-center gap-2">
+                                                <input 
+                                                    type="checkbox"
+                                                    x-model="formData[input.name]"
+                                                    class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+                                                >
+                                                <span class="text-sm text-gray-600" x-text="input.description || ''"></span>
+                                            </label>
+                                        </template>
+                                        
+                                        <!-- URL list -->
+                                        <template x-if="input.type === 'url_list' || input.type === 'array'">
+                                            <textarea 
+                                                x-model="formData[input.name]"
+                                                :placeholder="input.placeholder || 'One item per line'"
+                                                :required="input.required"
+                                                rows="4"
+                                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                                            ></textarea>
+                                        </template>
+                                        
+                                        <!-- Help text -->
+                                        <p x-show="input.description && input.type !== 'checkbox'" class="mt-1 text-xs text-gray-500" x-text="input.description"></p>
+                                    </div>
+                                </template>
+                            </template>
+                            
+                            <!-- Fallback: JSON input -->
+                            <template x-if="!selectedTool?.inputs?.length">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        Input Data (JSON)
+                                    </label>
+                                    <textarea 
+                                        x-model="rawJsonInput"
+                                        placeholder='{"key": "value"}'
+                                        rows="6"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                                    ></textarea>
+                                </div>
+                            </template>
+                            
+                            <!-- Submit button -->
+                            <button 
+                                type="submit"
+                                :disabled="loading"
+                                :class="loading ? 'bg-gray-400' : 'accent-bg hover:opacity-90'"
+                                class="w-full py-3 text-white font-medium rounded-lg transition-all flex items-center justify-center gap-2"
+                            >
+                                <template x-if="loading">
+                                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                                    </svg>
+                                </template>
+                                <span x-text="loading ? 'Executing...' : 'Execute Tool'"></span>
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <!-- Results panel -->
+                    <div class="p-6 bg-gray-50">
+                        <h3 class="font-semibold text-gray-900 mb-4">Results</h3>
+                        
+                        <!-- No result yet -->
+                        <div x-show="!result && !loading" class="text-center py-12 text-gray-400">
+                            <svg class="w-12 h-12 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <p>Execute the tool to see results</p>
+                        </div>
+                        
+                        <!-- Loading state -->
+                        <div x-show="loading" class="text-center py-12">
+                            <div class="relative inline-flex pulse-ring">
+                                <span class="text-4xl" x-text="selectedTool?.icon || '⚙️'"></span>
+                            </div>
+                            <p class="mt-4 text-gray-600">Processing...</p>
+                        </div>
+                        
+                        <!-- Error state -->
+                        <div x-show="result && !result.success" class="bg-red-50 border border-red-200 rounded-lg p-4">
+                            <div class="flex items-center gap-2 text-red-700 font-medium mb-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                Execution Failed
+                            </div>
+                            <p class="text-sm text-red-600" x-text="result?.error"></p>
+                        </div>
+                        
+                        <!-- Success state -->
+                        <div x-show="result && result.success">
+                            <!-- Execution info -->
+                            <div class="flex items-center gap-4 mb-4 text-sm text-gray-500">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span x-text="`${result?.execution_time_ms?.toFixed(0)}ms`"></span>
+                                </span>
+                                <span class="flex items-center gap-1 text-green-600">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Success
+                                </span>
+                            </div>
+                            
+                            <!-- Result data -->
+                            <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                                <!-- Table view for array results -->
+                                <template x-if="Array.isArray(result?.data) || (result?.data && Object.values(result.data).some(v => Array.isArray(v)))">
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-sm">
+                                            <thead class="bg-gray-50">
+                                                <tr>
+                                                    <template x-for="col in getResultColumns()" :key="col">
+                                                        <th class="px-4 py-2 text-left font-medium text-gray-700" x-text="col"></th>
+                                                    </template>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-gray-100">
+                                                <template x-for="(row, idx) in getResultRows()" :key="idx">
+                                                    <tr>
+                                                        <template x-for="col in getResultColumns()" :key="col">
+                                                            <td class="px-4 py-2 text-gray-600" x-text="formatValue(row[col])"></td>
+                                                        </template>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </template>
+                                
+                                <!-- JSON view for other results -->
+                                <template x-if="!Array.isArray(result?.data) && !(result?.data && Object.values(result.data).some(v => Array.isArray(v)))">
+                                    <pre class="p-4 text-sm overflow-auto max-h-96 font-mono" x-text="JSON.stringify(result?.data, null, 2)"></pre>
+                                </template>
+                            </div>
+                            
+                            <!-- Actions -->
+                            <div x-show="selectedTool?.actions?.length" class="mt-4 flex gap-2">
+                                <template x-for="action in selectedTool?.actions" :key="action.id">
+                                    <button 
+                                        @click="executeAction(action)"
+                                        class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-700 transition-colors"
+                                    >
+                                        <span x-text="action.icon || ''"></span>
+                                        <span x-text="action.label"></span>
+                                    </button>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </main>
+    
+    <!-- Footer -->
+    <footer class="border-t border-gray-200 mt-12 py-6 text-center text-sm text-gray-500">
+        <p>SEO Intelligence Platform v2.0 • Manifest-Driven Tool Framework</p>
+    </footer>
+    
+    <script>
+        function app() {
+            return {
+                // State
+                tools: [],
+                archetypes: [],
+                selectedTool: null,
+                selectedArchetype: null,
+                searchQuery: '',
+                loading: false,
+                result: null,
+                formData: {},
+                rawJsonInput: '{}',
+                
+                // API base URL
+                apiBase: window.location.origin,
+                
+                // Initialize
+                async init() {
+                    await this.loadTools();
+                    await this.loadArchetypes();
+                },
+                
+                // Load tools from API
+                async loadTools() {
+                    try {
+                        const response = await fetch(`${this.apiBase}/api/tools`);
+                        const data = await response.json();
+                        this.tools = data.tools || [];
+                    } catch (e) {
+                        console.error('Failed to load tools:', e);
+                        // Demo mode
+                        this.tools = this.getDemoTools();
+                    }
+                },
+                
+                // Load archetypes
+                async loadArchetypes() {
+                    try {
+                        const response = await fetch(`${this.apiBase}/api/archetypes`);
+                        const data = await response.json();
+                        this.archetypes = data.archetypes || [];
+                    } catch (e) {
+                        this.archetypes = [
+                            { id: 'analyzer', name: 'Analyzer', icon: '🔍' },
+                            { id: 'generator', name: 'Generator', icon: '✨' },
+                            { id: 'monitor', name: 'Monitor', icon: '📊' },
+                            { id: 'optimizer', name: 'Optimizer', icon: '⚡' },
+                            { id: 'discoverer', name: 'Discoverer', icon: '🎯' },
+                        ];
+                    }
+                },
+                
+                // Filtered tools
+                get filteredTools() {
+                    let filtered = this.tools;
+                    
+                    if (this.selectedArchetype) {
+                        filtered = filtered.filter(t => t.archetype === this.selectedArchetype);
+                    }
+                    
+                    if (this.searchQuery) {
+                        const query = this.searchQuery.toLowerCase();
+                        filtered = filtered.filter(t => 
+                            t.name.toLowerCase().includes(query) ||
+                            t.description?.toLowerCase().includes(query) ||
+                            t.id.toLowerCase().includes(query)
+                        );
+                    }
+                    
+                    return filtered;
+                },
+                
+                // Select a tool
+                selectTool(tool) {
+                    this.selectedTool = tool;
+                    this.result = null;
+                    this.formData = {};
+                    this.rawJsonInput = '{}';
+                    
+                    // Initialize form data with defaults
+                    if (tool.inputs) {
+                        tool.inputs.forEach(input => {
+                            if (input.default !== undefined) {
+                                this.formData[input.name] = input.default;
+                            }
+                        });
+                    }
+                },
+                
+                // Execute tool
+                async executeTool() {
+                    if (!this.selectedTool) return;
+                    
+                    this.loading = true;
+                    this.result = null;
+                    
+                    try {
+                        // Prepare data
+                        let data = { ...this.formData };
+                        
+                        // If no inputs defined, try to parse raw JSON
+                        if (!this.selectedTool.inputs?.length) {
+                            try {
+                                data = JSON.parse(this.rawJsonInput);
+                            } catch (e) {
+                                data = {};
+                            }
+                        }
+                        
+                        // Process array inputs
+                        this.selectedTool.inputs?.forEach(input => {
+                            if ((input.type === 'url_list' || input.type === 'array') && typeof data[input.name] === 'string') {
+                                data[input.name] = data[input.name].split('\n').map(s => s.trim()).filter(Boolean);
+                            }
+                        });
+                        
+                        const response = await fetch(`${this.apiBase}/api/tools/${this.selectedTool.id}/execute`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ data }),
+                        });
+                        
+                        this.result = await response.json();
+                        
+                    } catch (e) {
+                        console.error('Execution failed:', e);
+                        this.result = {
+                            success: false,
+                            error: e.message || 'Failed to execute tool',
+                        };
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                
+                // Get archetype icon
+                getArchetypeIcon(archetype) {
+                    const icons = {
+                        analyzer: '🔍',
+                        generator: '✨',
+                        monitor: '📊',
+                        optimizer: '⚡',
+                        discoverer: '🎯',
+                    };
+                    return icons[archetype] || '⚙️';
+                },
+                
+                // Get columns from result data
+                getResultColumns() {
+                    if (!this.result?.data) return [];
+                    
+                    // Find first array in result
+                    let arr = this.result.data;
+                    if (!Array.isArray(arr)) {
+                        for (const [key, val] of Object.entries(this.result.data)) {
+                            if (Array.isArray(val) && val.length > 0) {
+                                arr = val;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (Array.isArray(arr) && arr.length > 0 && typeof arr[0] === 'object') {
+                        return Object.keys(arr[0]);
+                    }
+                    return [];
+                },
+                
+                // Get rows from result data
+                getResultRows() {
+                    if (!this.result?.data) return [];
+                    
+                    if (Array.isArray(this.result.data)) {
+                        return this.result.data;
+                    }
+                    
+                    for (const [key, val] of Object.entries(this.result.data)) {
+                        if (Array.isArray(val)) {
+                            return val;
+                        }
+                    }
+                    return [];
+                },
+                
+                // Format value for display
+                formatValue(val) {
+                    if (val === null || val === undefined) return '-';
+                    if (typeof val === 'object') return JSON.stringify(val);
+                    if (typeof val === 'number') return val.toLocaleString();
+                    return String(val);
+                },
+                
+                // Execute action on result
+                executeAction(action) {
+                    console.log('Execute action:', action, this.result);
+                    // Implement action handlers here
+                },
+                
+                // Demo tools (when API unavailable)
+                getDemoTools() {
+                    return [
+                        {
+                            id: 'content_gap_discovery',
+                            name: 'Content Gap Discovery',
+                            description: 'Discover content gaps by analyzing competitors',
+                            category: 'content',
+                            archetype: 'discoverer',
+                            icon: '🎯',
+                            inputs: [
+                                { name: 'domain', label: 'Your Domain', type: 'text', required: true, placeholder: 'example.com' },
+                                { name: 'competitors', label: 'Competitor Domains', type: 'url_list', placeholder: 'One domain per line' },
+                                { name: 'min_volume', label: 'Min Search Volume', type: 'number', default: 100 },
+                            ],
+                        },
+                        {
+                            id: 'keyword_clustering',
+                            name: 'Keyword Clustering',
+                            description: 'Cluster keywords by semantic similarity',
+                            category: 'keywords',
+                            archetype: 'analyzer',
+                            icon: '🔍',
+                            inputs: [
+                                { name: 'keywords', label: 'Keywords', type: 'textarea', required: true, placeholder: 'One keyword per line' },
+                                { name: 'min_cluster_size', label: 'Min Cluster Size', type: 'number', default: 3 },
+                            ],
+                        },
+                        {
+                            id: 'internal_link_optimizer',
+                            name: 'Internal Link Optimizer',
+                            description: 'Optimize internal linking structure',
+                            category: 'technical',
+                            archetype: 'optimizer',
+                            icon: '⚡',
+                            inputs: [
+                                { name: 'site_url', label: 'Site URL', type: 'text', required: true },
+                                { name: 'max_suggestions', label: 'Max Suggestions', type: 'number', default: 50 },
+                            ],
+                        },
+                    ];
+                },
+            };
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+evidence_model:
+  version: "2026-02-05"
+  evidence_sources:
+    - id: serp_top_urls
+      class: "serp"
+      strength_hint: "high"
+    - id: serp_features
+      class: "serp"
+      strength_hint: "medium"
+    - id: serp_paa
+      class: "serp"
+      strength_hint: "medium"
+    - id: serp_related_searches
+      class: "serp"
+      strength_hint: "medium"
+    - id: autocomplete
+      class: "serp"
+      strength_hint: "low"
+    - id: ads_keyword_ideas
+      class: "ads"
+      strength_hint: "high"
+    - id: gsc_queries
+      class: "gsc"
+      strength_hint: "high"
+    - id: crawl_entities
+      class: "crawl"
+      strength_hint: "medium"
+    - id: embeddings
+      class: "ml"
+      strength_hint: "medium"
+    - id: llm_inferred
+      class: "llm"
+      strength_hint: "low"
+
+  provenance_policy:
+    # Used by the UI (borders/opacity) and by confidence rules.
+    confidence_caps:
+      llm_only_no_serp: 0.55
+      serp_present: 0.90
+
+  minimum_evidence_for_confidence:
+    high:
+      requires_any: ["serp_top_urls", "ads_keyword_ideas", "gsc_queries"]
+    medium:
+      requires_any: ["serp_features", "serp_paa", "embeddings", "crawl_entities"]
+    low:
+      allows: ["llm_inferred", "autocomplete"]

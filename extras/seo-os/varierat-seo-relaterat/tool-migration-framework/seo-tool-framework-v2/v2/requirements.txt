@@ -1,0 +1,19 @@
+# SEO Intelligence Platform - Tool Framework v2
+# Requirements
+
+# Core
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.5.0
+pyyaml>=6.0.1
+
+# Optional: for enhanced features
+python-multipart>=0.0.6  # File uploads
+aiohttp>=3.9.0           # Async HTTP client
+redis>=5.0.0             # Result caching
+prometheus-client>=0.19.0 # Metrics
+
+# Development
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+httpx>=0.25.0            # Async test client

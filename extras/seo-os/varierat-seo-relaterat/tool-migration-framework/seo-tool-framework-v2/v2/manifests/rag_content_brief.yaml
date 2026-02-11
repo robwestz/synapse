@@ -1,0 +1,139 @@
+# RAG Content Brief Generator Tool Manifest
+
+tool:
+  id: rag_content_brief
+  name: "RAG Content Brief Generator"
+  description: "Generate comprehensive content briefs using AI. Creates detailed outlines, competitor analysis, and SEO recommendations for any topic."
+  
+  category: content
+  archetype: generator
+  icon: "✨"
+  color: "#10B981"
+  
+  backend:
+    module: "tools.test_tools.rag_content_brief"
+    class: "RAGContentBriefService"
+    config_class: "RAGContentBriefServiceConfig"
+    result_class: "RAGContentBriefServiceResult"
+    method: "generate"
+  
+  inputs:
+    - name: keyword
+      label: "Target Keyword"
+      type: text
+      required: true
+      placeholder: "seo optimization"
+      description: "The main keyword/topic for the content"
+    
+    - name: content_type
+      label: "Content Type"
+      type: select
+      default: "guide"
+      options:
+        - value: guide
+          label: "Comprehensive Guide"
+        - value: comparison
+          label: "Comparison/Review"
+        - value: tutorial
+          label: "Step-by-Step Tutorial"
+        - value: listicle
+          label: "Listicle/Top X"
+      description: "Type of content to create"
+    
+    - name: target_audience
+      label: "Target Audience"
+      type: text
+      default: "marketing professionals"
+      placeholder: "e.g., beginners, enterprise marketers, developers"
+      description: "Who is this content for?"
+    
+    - name: competitors
+      label: "Competitor URLs to Analyze"
+      type: url_list
+      required: false
+      placeholder: |
+        https://competitor1.com/article
+        https://competitor2.com/guide
+      description: "URLs of competing content to analyze (optional)"
+  
+  outputs:
+    type: structured
+    sections:
+      - name: overview
+        type: key_value
+        fields:
+          - target_keyword
+          - search_intent
+          - recommended_word_count
+          - content_angle
+      
+      - name: title_suggestions
+        type: list
+        title: "Title Options"
+      
+      - name: meta_description
+        type: text
+        title: "Meta Description"
+      
+      - name: secondary_keywords
+        type: tags
+        title: "Secondary Keywords"
+      
+      - name: outline
+        type: outline
+        title: "Content Outline"
+        fields:
+          - heading
+          - heading_level
+          - suggested_word_count
+          - key_points
+          - keywords_to_include
+      
+      - name: competitor_insights
+        type: table
+        title: "Competitor Analysis"
+        columns:
+          - name: competitor_url
+            label: "URL"
+            truncate: true
+          - name: word_count
+            label: "Words"
+            type: number
+          - name: key_topics
+            label: "Topics"
+            type: array
+          - name: missing_in_their_content
+            label: "Gaps to Exploit"
+            type: array
+      
+      - name: unique_value_proposition
+        type: text
+        title: "Your Unique Angle"
+        highlight: true
+      
+      - name: internal_link_suggestions
+        type: list
+        title: "Internal Links to Include"
+      
+      - name: external_sources
+        type: list
+        title: "Recommended External Sources"
+  
+  actions:
+    - id: export_brief
+      label: "Export as Document"
+      icon: "📄"
+      type: export
+      format: docx
+    
+    - id: create_draft
+      label: "Generate Full Draft"
+      icon: "✍️"
+      type: chain
+      note: "Requires AI Writer integration"
+    
+    - id: send_to_writer
+      label: "Send to Writer"
+      icon: "📧"
+      type: webhook
+      endpoint: "/api/assignments/create"

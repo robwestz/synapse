@@ -1,0 +1,98 @@
+{
+  "name": "Entity Atlas Intelligence Platform",
+  "version": "0.9.0",
+  "engine_version": "0.9.0",
+  "model_version": "1.0.0",
+  "rules_version": "1.0.0",
+  
+  "phases": {
+    "foundation": {
+      "status": "COMPLETE",
+      "items": [
+        {"id": "F1", "name": "Galaxy View", "status": "COMPLETE"},
+        {"id": "F2", "name": "Entity popup", "status": "COMPLETE"},
+        {"id": "F3", "name": "Autocomplete expand", "status": "COMPLETE"},
+        {"id": "F4", "name": "Offline clustering", "status": "COMPLETE"}
+      ]
+    },
+    "killer_feature": {
+      "status": "IN_PROGRESS",
+      "items": [
+        {"id": "K1", "name": "Canonical types", "status": "COMPLETE", "file": "core/canonical_types.py"},
+        {"id": "K2", "name": "Ahrefs normalizer", "status": "COMPLETE", "file": "core/normalizers/ahrefs_normalizer.py"},
+        {"id": "K3", "name": "Attribution pipeline", "status": "COMPLETE", "file": "pipelines/attribution_pipeline.py"},
+        {"id": "K4", "name": "Gap analyzer", "status": "COMPLETE", "file": "analyzers/gap_analyzer.py"},
+        {"id": "K5", "name": "Dominance lens", "status": "COMPLETE", "file": "analyzers/dominance_lens.py"},
+        {"id": "K6", "name": "API endpoints", "status": "COMPLETE", "file": "engine.py"},
+        {"id": "K7", "name": "Upload UI", "status": "COMPLETE", "file": "index.html"},
+        {"id": "K8", "name": "Gap View UI", "status": "COMPLETE", "file": "index.html"},
+        {"id": "K9", "name": "SERP API client", "status": "COMPLETE", "file": "clients/serp_client.py"}
+      ]
+    },
+    "entity_intelligence": {
+      "status": "PENDING",
+      "items": [
+        {"id": "E1", "name": "Entity resolution (Wikidata)", "status": "PENDING"},
+        {"id": "E2", "name": "Entity properties", "status": "PENDING"},
+        {"id": "E3", "name": "Semantic mass v1.1", "status": "PENDING"},
+        {"id": "E4", "name": "Entity Profile View", "status": "PENDING"}
+      ]
+    },
+    "gap_pro": {
+      "status": "PENDING",
+      "items": [
+        {"id": "G1", "name": "Coverage scoring", "status": "PENDING"},
+        {"id": "G2", "name": "Competitor enrichment", "status": "PENDING"},
+        {"id": "G3", "name": "Priority with SERP homogeneity", "status": "PENDING"}
+      ]
+    },
+    "professional": {
+      "status": "PENDING",
+      "items": [
+        {"id": "P1", "name": "Matrix view", "status": "PENDING"},
+        {"id": "P2", "name": "Bulk export", "status": "PENDING"},
+        {"id": "P3", "name": "Project save/load", "status": "PENDING"},
+        {"id": "P4", "name": "Comparison View", "status": "PENDING"}
+      ]
+    },
+    "serp_validation": {
+      "status": "PENDING",
+      "items": [
+        {"id": "S1", "name": "SERP alignment view", "status": "PENDING"},
+        {"id": "S2", "name": "Page-type classifier", "status": "PENDING"},
+        {"id": "S3", "name": "PAA clustering", "status": "PENDING"}
+      ]
+    }
+  },
+  
+  "current_phase": "killer_feature",
+  "current_item": "K7",
+  
+  "files_created": [
+    "core/__init__.py",
+    "core/canonical_types.py",
+    "core/normalizers/__init__.py",
+    "core/normalizers/ahrefs_normalizer.py"
+  ],
+  
+  "canonical_objects": [
+    "Query", "Entity", "Cluster", "Evidence", "EntityResolution",
+    "SERPObservation", "RankingImport", "AttributedKeyword", "EntityGap"
+  ],
+  
+  "hard_rules": [
+    "R0: Output/storage uses canonical objects only",
+    "R1: All conclusions explainable via Evidence",
+    "R2: Determinism - same input + version = same IDs",
+    "R3: All import via central normalizer",
+    "R4: Attribution pipeline mandatory for all rank data",
+    "R5: Online verification optional with explicit provenance"
+  ],
+  
+  "quality_gates": {
+    "intent_precision": 0.80,
+    "cluster_stability": 0.85,
+    "entity_resolution_hit_rate": 0.60,
+    "coherence_delta": 0.10
+  }
+}

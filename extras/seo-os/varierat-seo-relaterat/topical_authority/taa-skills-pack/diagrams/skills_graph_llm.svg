@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="900" viewBox="0 0 1400 900">
+  <style>
+    .node { font: 12px monospace; fill: #111 }
+    .box { fill: #f5f7fb; stroke: #1f4aff; stroke-width:1.5 }
+    .edge { stroke: #444; stroke-width:1.2; marker-end: url(#arrow) }
+    .edge.dep { stroke-dasharray: 5 4 }
+    .edge.feed { stroke-dasharray: 1 0 }
+    .phase { font: 700 14px system-ui; fill: #555 }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#444"/>
+    </marker>
+  </defs>
+  <text x="120" y="40" class="phase">INGEST</text>
+  <text x="560" y="40" class="phase">KNOWLEDGE</text>
+  <text x="860" y="40" class="phase">FORECAST</text>
+  <text x="1060" y="40" class="phase">AUTOMATE</text>
+  <text x="1240" y="40" class="phase">DELIVER</text>
+  <g id="first-party-ingest" transform="translate(60,90)">
+    <rect class="box" width="220" height="60" rx="8"/>
+    <text class="node" x="10" y="22">first-party-ingest</text>
+    <text class="node" x="10" y="42">produces: entity_metrics.*</text>
+  </g>
+  <g id="render-crawler" transform="translate(60,180)">
+    <rect class="box" width="220" height="60" rx="8"/>
+    <text class="node" x="10" y="22">render-crawler</text>
+    <text class="node" x="10" y="42">produces: url_index.*</text>
+  </g>
+  <g id="entity-reconciler" transform="translate(470,90)">
+    <rect class="box" width="250" height="60" rx="8"/>
+    <text class="node" x="10" y="22">entity-reconciler</text>
+    <text class="node" x="10" y="42">produces: reconciled_entities.*</text>
+  </g>
+  <g id="link-graph-analytics" transform="translate(470,180)">
+    <rect class="box" width="250" height="60" rx="8"/>
+    <text class="node" x="10" y="22">link-graph-analytics</text>
+    <text class="node" x="10" y="42">produces: graph_metrics.*</text>
+  </g>
+  <g id="competitive-modeler" transform="translate(800,90)">
+    <rect class="box" width="240" height="60" rx="8"/>
+    <text class="node" x="10" y="22">competitive-modeler</text>
+    <text class="node" x="10" y="42">produces: coverage_matrix.*</text>
+  </g>
+  <g id="impact-forecaster" transform="translate(800,180)">
+    <rect class="box" width="240" height="60" rx="8"/>
+    <text class="node" x="10" y="22">impact-forecaster</text>
+    <text class="node" x="10" y="42">produces: backlog_prioritized.*</text>
+  </g>
+  <g id="quality-harness" transform="translate(1060,90)">
+    <rect class="box" width="240" height="60" rx="8"/>
+    <text class="node" x="10" y="22">quality-harness</text>
+    <text class="node" x="10" y="42">produces: quality_report.*</text>
+  </g>
+  <g id="schema-compiler" transform="translate(1060,180)">
+    <rect class="box" width="240" height="60" rx="8"/>
+    <text class="node" x="10" y="22">schema-compiler</text>
+    <text class="node" x="10" y="42">produces: jsonld/*.json</text>
+  </g>
+  <g id="programmatic-factory" transform="translate(1060,270)">
+    <rect class="box" width="240" height="60" rx="8"/>
+    <text class="node" x="10" y="22">programmatic-factory</text>
+    <text class="node" x="10" y="42">produces: pages/*.html</text>
+  </g>
+  <g id="delivery-devops" transform="translate(1260,180)">
+    <rect class="box" width="240" height="60" rx="8"/>
+    <text class="node" x="10" y="22">delivery-devops</text>
+    <text class="node" x="10" y="42">produces: manifest.json</text>
+  </g>
+  <g id="monitoring-agent" transform="translate(1260,270)">
+    <rect class="box" width="240" height="60" rx="8"/>
+    <text class="node" x="10" y="22">monitoring-agent</text>
+    <text class="node" x="10" y="42">produces: alerts.json</text>
+  </g>
+  <line class="edge dep" x1="280" y1="120" x2="470" y2="120"/>
+  <line class="edge dep" x1="280" y1="210" x2="470" y2="210"/>
+  <line class="edge dep" x1="710" y1="120" x2="800" y2="120"/>
+  <line class="edge feed" x1="280" y1="120" x2="800" y2="120"/>
+  <line class="edge feed" x1="720" y1="210" x2="800" y2="210"/>
+  <line class="edge feed" x1="1040" y1="120" x2="1260" y2="210"/>
+  <line class="edge feed" x1="1040" y1="210" x2="1260" y2="210"/>
+  <line class="edge feed" x1="1040" y1="300" x2="1260" y2="300"/>
+</svg>

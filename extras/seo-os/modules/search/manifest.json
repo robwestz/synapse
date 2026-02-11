@@ -1,0 +1,10 @@
+{
+  "id": "search_studio",
+  "name": "Search Studio",
+  "version": "1.0.0",
+  "description": "Enterprise-grade SERP extraction with AI intent and clustering.",
+  "category": "Extraction",
+  "icon": "🔍",
+  "entry_point": "ui.py",
+  "ml_dependencies": ["intent", "clustering"]
+}

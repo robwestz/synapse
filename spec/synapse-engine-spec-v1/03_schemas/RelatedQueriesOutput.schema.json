@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "RelatedQueriesOutput.schema.json",
+  "title": "RelatedQueriesOutput",
+  "type": "object",
+  "required": [
+    "meta",
+    "seed",
+    "selected"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": [
+        "generated_at",
+        "language",
+        "market",
+        "target_count"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "generated_at": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "market": {
+          "type": "string"
+        },
+        "target_count": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "candidate_pool_size": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "seed": {
+      "type": "object",
+      "required": [
+        "phrase",
+        "id",
+        "dominant_intent",
+        "perspective"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "phrase": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        },
+        "dominant_intent": {
+          "type": "string"
+        },
+        "perspective": {
+          "type": "string"
+        }
+      }
+    },
+    "selected": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "phrase",
+          "rank",
+          "provenance",
+          "relevance_score",
+          "intent",
+          "perspective",
+          "synapse_to_seed"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "phrase": {
+            "type": "string"
+          },
+          "rank": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "provenance": {
+            "type": "string",
+            "enum": [
+              "ads_api",
+              "gsc",
+              "serp_paa",
+              "serp_related",
+              "autocomplete",
+              "crawl",
+              "llm_inferred"
+            ]
+          },
+          "relevance_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "intent": {
+            "type": "string"
+          },
+          "perspective": {
+            "type": "string"
+          },
+          "cluster_id": {
+            "type": "string"
+          },
+          "synapse_to_seed": {
+            "$ref": "SynapseCard.schema.json"
+          },
+          "metrics": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}
